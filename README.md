@@ -20,7 +20,7 @@ Planned modules:
 
 Discord: FinancedDart#1863
 
-Project Link: https://github.com/FinancedDart1863/
+Project Link: https://github.com/FinancedDart1863/PEW_Core
 
 Steam Workshop: [Not yet available]
 
@@ -28,5 +28,6 @@ Steam Workshop: [Not yet available]
 
 © 2023 FinancedDart
 
-Please ask for permission before duplicating and reusing code found in this repository.
-I am generally relaxed about this and will likely grant permission, but please do ask first.
+Please ask for permission before duplicating and reusing code found in this repository if you
+are doing so in your SE mod. I am generally relaxed about this and will likely grant permission, 
+but please do ask first.
