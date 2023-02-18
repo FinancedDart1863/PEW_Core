@@ -49,9 +49,9 @@ namespace PEWCore
         [ProtoMember(3)]
         public bool PEWKOTH_Hill1AlwaysOn = false; //Is hill 1 always active if its enabled?
         [ProtoMember(4)]
-        public int PEWWKOTH_Hill1TurnOnTime = 19; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        public int PEWKOTH_Hill1TurnOnTime = 19; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
         [ProtoMember(5)]
-        public int PEWWKOTH_Hill1TurnOffTime = 20; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        public int PEWKOTH_Hill1TurnOffTime = 20; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
         [ProtoMember(6)]
         public bool PEWKOTH_Hill1OnSunday = true; //Is hill 1 active during the time frame on this day? 
         [ProtoMember(7)]
@@ -98,9 +98,9 @@ namespace PEWCore
         [ProtoMember(27)]
         public bool PEWKOTH_Hill2AlwaysOn = false; //Is hill 2 always active if its enabled?
         [ProtoMember(28)]
-        public int PEWWKOTH_Hill2TurnOnTime = 19; //If PEWKOTH_Hill2AlwaysOn is false and PEWKOTH_Hill2Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        public int PEWKOTH_Hill2TurnOnTime = 19; //If PEWKOTH_Hill2AlwaysOn is false and PEWKOTH_Hill2Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
         [ProtoMember(29)]
-        public int PEWWKOTH_Hill2TurnOffTime = 20; //If PEWKOTH_Hill2AlwaysOn is false and PEWKOTH_Hill2Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        public int PEWKOTH_Hill2TurnOffTime = 20; //If PEWKOTH_Hill2AlwaysOn is false and PEWKOTH_Hill2Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
         [ProtoMember(30)]
         public bool PEWKOTH_Hill2OnSunday = true; //Is hill 2 active during the time frame on this day? 
         [ProtoMember(31)]
@@ -147,9 +147,9 @@ namespace PEWCore
         [ProtoMember(51)]
         public bool PEWKOTH_Hill3AlwaysOn = false; //Is hill 3 always active if its enabled?
         [ProtoMember(52)]
-        public int PEWWKOTH_Hill3TurnOnTime = 19; //If PEWKOTH_Hill3AlwaysOn is false and PEWKOTH_Hill3Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        public int PEWKOTH_Hill3TurnOnTime = 19; //If PEWKOTH_Hill3AlwaysOn is false and PEWKOTH_Hill3Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
         [ProtoMember(53)]
-        public int PEWWKOTH_Hill3TurnOffTime = 20; //If PEWKOTH_Hill3AlwaysOn is false and PEWKOTH_Hill3Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        public int PEWKOTH_Hill3TurnOffTime = 20; //If PEWKOTH_Hill3AlwaysOn is false and PEWKOTH_Hill3Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
         [ProtoMember(54)]
         public bool PEWKOTH_Hill3OnSunday = true; //Is hill 3 active during the time frame on this day?
         [ProtoMember(55)]
