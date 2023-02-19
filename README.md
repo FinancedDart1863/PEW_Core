@@ -10,11 +10,21 @@ Planned core features:
 - Unified configuration
 - Unified logging
 
-Planned modules:
+Planned key modules:
 - High value target subsystem
 - King of the hill subsystem
 - Dynamic safezone subsystem
 - Aysnchronous campaign subsystem (Iteration non-specific)
+
+Planned generic/misc tools:
+- Self filling/topping cargo container with item specification
+- Recruit station faction assignment manager
+
+This mod constitutes the foundation for all PEW public multiplayer server gameplay features and mechanics.
+
+## Configuration
+
+Phobos Engineered Weaponry core systems must be configured immediately upon deployment on public server. We do so here. The configuration is extensive.
 
 ## Contact
 
@@ -27,7 +37,8 @@ Steam Workshop: [Not yet available]
 ## Copyright
 
 © 2023 FinancedDart
+© 2023 Phobos Engineered Weaponry Group
+© 2023 Sadragos (Affiliate - Tiered Tech)
 
-Please ask for permission before duplicating and reusing code found in this repository if you
-are doing so in your SE mod. I am generally relaxed about this and will likely grant permission, 
-but please do ask first.
+You are not permitted to use code from this repository without my express permission. Unauthorized re-use, re-upload, or duplication of this code and/or SE mod will
+result in a DMCA and legal action. Contact me for permission requests and any questions. Any derivative mods for which permission has been granted must be unlisted.
