@@ -36,9 +36,9 @@ Steam Workshop: [Not yet available]
 
 ## Copyright
 
-© 2023 FinancedDart
-© 2023 Phobos Engineered Weaponry Group
-© 2023 Sadragos (Affiliate - Tiered Tech)
+© 2023 FinancedDart <br />
+© 2023 Phobos Engineered Weaponry Group <br />
+© 2023 Sadragos (Affiliate - Tiered Tech) <br />
 
 You are not permitted to use code from this repository without my express permission. Unauthorized re-use, re-upload, or duplication of this code and/or SE mod will
 result in a DMCA and legal action. Contact me for permission requests and any questions. Any derivative mods for which permission has been granted must be unlisted.
