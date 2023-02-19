@@ -1,4 +1,6 @@
-﻿using ProtoBuf;
+﻿//© FinancedDart
+//© Phobos Engineered Weaponry Group
+using ProtoBuf;
 
 namespace PEWCore
 {
@@ -23,6 +25,14 @@ namespace PEWCore
         public string PEWCore_Faction3Tag = "xxxxx"; //Tag of faction 3
         [ProtoMember(4)]
         public bool DeveloperMode = true; //In developer mode, code execution is described in the in-game chat
+        [ProtoMember(5)]
+        public bool PEWHVT_ModuleEnable = true; //Enable/disable the HVT subsystem. Do not touch this if you don't know know what you're doing. (Disabling this may cause modules with HVT subsystem dependencies to fail, such as the safezone subsystem)
+        [ProtoMember(6)]
+        public int PEWHVT_ExecutionInterval = 1; // Execution interval for module logic in seconds. Do not touch this if you don't know know what you're doing.
+        [ProtoMember(7)]
+        public bool PEWKOTH_ModuleEnable = true; //Enable/disable the HVT subsystem. Do not touch this if you don't know know what you're doing. (Disabling this may cause modules with HVT subsystem dependencies to fail, such as the safezone subsystem)
+        [ProtoMember(8)]
+        public int PEWKOTH_ExecutionInterval = 1; // Execution interval for module logic in seconds. Do not touch this if you don't know know what you're doing.
     }
 
     [ProtoContract(UseProtoMembersOnly = true)]
@@ -31,10 +41,8 @@ namespace PEWCore
         [ProtoMember(1)]
         public int PEWHVT_CheckInterval = 3600; // How often to check world for HVT grids. (seconds)
         [ProtoMember(2)]
-        public int PEWHVT_ExecutionInterval = 1; // Execution interval for mod logic. (seconds) 
-        [ProtoMember(3)]
         public int PEWHVT_HVTThreshold = 7500; //Standard threshold for a grid/grid-group to be flagged as an HVT. (Block count)
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         public int PEWHVT_HVTThresholdE52 = 11000; //Threshold for a grid/grid-group employed the E52 Special Weapon to be flagged as an HVT. (Block count)
     }
 
