@@ -1,0 +1,23 @@
+﻿<?xml version="1.0"?>
+<Definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<CategoryClasses>
+		<Category xsi:type="MyObjectBuilder_GuiBlockCategoryDefinition">
+			<Id>
+				<TypeId>GuiBlockCategoryDefinition</TypeId>
+				<SubtypeId/>
+			</Id>
+			<DisplayName>一System</DisplayName>
+			<Name>一System</Name>
+			<SearchBlocks>true</SearchBlocks>
+			<IsShipCategory>false</IsShipCategory>
+			<IsBlockCategory>true</IsBlockCategory>
+			<IsToolCategory>false</IsToolCategory>
+			<ItemIds>
+				<string>PEWCoreLOGICALBeacon</string>		
+				<string>PEWCoreLOGICALLGSmallCargo</string>	
+				<string>PEWCoreLOGICALCore</string>
+				<string>PEWCoreLOGICALZone</string>
+			</ItemIds>
+		</Category>
+	</CategoryClasses>
+</Definitions>
