@@ -156,8 +156,9 @@ namespace PEWCore
                 {
                 }
 
-                //Execute core sections here
-                PEWCoreLogicalCoreProcess.Process();
+                //Process logical cores [Server]
+                if (MyAPIGateway.Multiplayer.IsServer)
+                    PEWCoreLogicalCoreProcess.Process();
 
 
                 lastUpdate = DateTime.Now;
