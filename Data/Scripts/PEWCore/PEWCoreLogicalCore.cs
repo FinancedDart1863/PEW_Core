@@ -1,5 +1,5 @@
-﻿//© FinancedDart
-//© Phobos Engineered Weaponry Group
+﻿//© 2023 FinancedDart
+//© 2023 Phobos Engineered Weaponry Group
 using System;
 using System.Collections.Generic;
 using System.Linq;
