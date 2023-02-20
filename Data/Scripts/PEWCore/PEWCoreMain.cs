@@ -1,5 +1,5 @@
-﻿//© FinancedDart
-//© Phobos Engineered Weaponry Group
+﻿//© 2023 FinancedDart
+//© 2023 Phobos Engineered Weaponry Group
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +19,7 @@ using VRage.Game.ModAPI;
 using Sandbox.Game.GUI;
 using VRage.Game.ObjectBuilders.Definitions;
 using ProtoBuf;
+using PEWCore.Network;
 
 namespace PEWCore
 {
@@ -41,8 +42,15 @@ namespace PEWCore
         public PEWCoreConfig ConfigData; //All configuration data will become accessible via this handle
         private const string CONFIG_FILE_NAME = "PEWCoreConfig.xml";
 
+
+        //PEWCore is heavily driven by PEWCoreLogicalCores, we setup timing to check for them
         private static DateTime lastUpdate;
+
+        //Initialized flag for PEWCore basis
         private bool CoreInitialized;
+
+        //Allocate channel 42747 for PEWCore network communications system
+        public PEWNetworkMain PEWNetworkHandle = new PEWNetworkMain(42747);
 
         private void Initialize()
         {
@@ -115,9 +123,10 @@ namespace PEWCore
             }
         }
 
-        public void SetupNetwork()
+        public override void BeforeStart()
         {
-
+            //Setup network for both servers and clients
+            PEWNetworkHandle.Register();
         }
 
         public override void UpdateBeforeSimulation()
@@ -168,6 +177,9 @@ namespace PEWCore
             catch { }
 
             PEWCoreLogicalCoreProcess.clearTimer.Stop();
+
+            PEWNetworkHandle?.Unregister();
+            PEWNetworkHandle = null;
 
             base.UnloadData();
         }
