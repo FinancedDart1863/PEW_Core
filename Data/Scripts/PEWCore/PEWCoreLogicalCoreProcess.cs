@@ -36,7 +36,7 @@ namespace PEWCore
 {
     internal class PEWCoreLogicalCoreProcess
     {
-        private static List<IMyEntity> updateList;
+        private static Dictionary<IMyEntity, int> updatelist = null;
         private static bool Initialized = false;
 
         internal static System.Timers.Timer clearTimer = new System.Timers.Timer();
@@ -61,19 +61,27 @@ namespace PEWCore
             {
                 if (DateTime.Now - p.Value.Item2 > TimeSpan.FromSeconds(p.Value.Item3))
                 {
-                    ProcessLogicalCore(p.Value.Item1);
-                    updateList.Add(p.Key);
+                    MyAPIGateway.Utilities.ShowMessage("dbg","Scheduler");
+                    int temp = ProcessLogicalCore(p.Value.Item1);
+                    if (temp != 0) 
+                    {
+                        updatelist.Add(p.Key, temp);
+                    }
+                    else
+                    {
+                        updatelist.Add(p.Key, 1);
+                    }
                 }
             }
 
             //Update execution interval timer within the logical core
-            foreach (IMyEntity updatedItem in updateList)
+            foreach(KeyValuePair<IMyEntity, int> updatedItem in updatelist)
             {
-                if (PEWCoreLogicalCore.LastPEWCoreLogicalCoreUpdate.ContainsKey(updatedItem))
-                    PEWCoreLogicalCore.LastPEWCoreLogicalCoreUpdate[updatedItem] = new MyTuple<IMyEntity, DateTime, int>(updatedItem, DateTime.Now, PEWCoreLogicalCore.LastPEWCoreLogicalCoreUpdate[updatedItem].Item3);
+                if (PEWCoreLogicalCore.LastPEWCoreLogicalCoreUpdate.ContainsKey(updatedItem.Key))
+                    PEWCoreLogicalCore.LastPEWCoreLogicalCoreUpdate[updatedItem.Key] = new MyTuple<IMyEntity, DateTime, int>(updatedItem.Key, DateTime.Now, updatedItem.Value);
             }
 
-            updateList.Clear();
+            updatelist.Clear();
         }
 
         private static void Initialize()
@@ -82,15 +90,14 @@ namespace PEWCore
             MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | Initialize]", "Initialize");
             PEWCoreLogging.Instance.WriteLine("[PEWCoreLogicalCoreProcess | Initialize] Initialize");
             //MyVisualScriptLogicProvider.SendChatMessageColored("PEW HVT Subsystem: Detector Initialization...", VRageMath.Color.White);
-            updateList = new List<IMyEntity>();
+            updatelist = new Dictionary<IMyEntity, int>();
         }
 
-        private static bool ProcessLogicalCore(IMyEntity entity)
+        private static int ProcessLogicalCore(IMyEntity entity)
         {
-            //MyVisualScriptLogicProvider.SendChatMessageColored("Logical core process", VRageMath.Color.White);
             //Sanity check
             if (!(entity is IMyProgrammableBlock))
-                return false;
+                return 0;
 
             //IMyEntity parent is the entity
             IMyEntity parent = entity.GetTopMostParent();
@@ -103,28 +110,31 @@ namespace PEWCore
                 //return false;
 
             string[] instructionArray = LogicalCoreReadCustomData(CurrentPEWCoreLogicalCore.CustomData);
+
             switch (instructionArray[0])
             {
-                case "Undefined*":
+                case "Undefined":
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | ProcessLogicalCore]", "Switch segment: Standard undefined InsSet");
                     CurrentPEWCoreLogicalCore.CustomData = "istr0:Undefined*";
-                    break;
+                    return 1;
                 default:
+                    return PEWCoreProgramLibrary.LoadAndExecuteProgram(entity, instructionArray);
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | ProcessLogicalCore]", "Switch segment: Default");
-                    break;
             }
-            return true;
         }
 
         private static string[] LogicalCoreReadCustomData(string customData)
         {
+            //MyVisualScriptLogicProvider.SendChatMessageColored("Logical core process", VRageMath.Color.White);
             if (customData.Length < 2)
             {
-                return new String[20] {"Undefined*", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
+                //MyAPIGateway.Utilities.ShowMessage("dbg","debug1");
+                return new String[20] {"Undefined", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
             }
             else
             {
-                customData = customData.ToLowerInvariant();
+                //MyAPIGateway.Utilities.ShowMessage("dbg", "debug2");
+                //customData = customData.ToLowerInvariant();
                 string[] instructionSet = new String[20] { "Undefined*", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
                 //MyAPIGateway.Utilities.ShowMessage("DEBUG", customData);
                 for (int x = 0; x < 20; x++) //Loop 20 times, starting with x = 0 and x ending at 19
