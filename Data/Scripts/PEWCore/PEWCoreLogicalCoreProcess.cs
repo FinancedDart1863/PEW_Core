@@ -41,15 +41,14 @@ namespace PEWCore
 
         internal static System.Timers.Timer clearTimer = new System.Timers.Timer();
 
-        /// <summary>
-        /// Process logical cores
-        /// </summary>
-        public static void Process()
+        //Process logical cores
+        public static PEWCoreNonVolatileMemory Process(PEWCoreNonVolatileMemory nonVolatileMemoryHandle)
         {
+            //Sanity check
             if (MyAPIGateway.Session == null)
-                return;
+                return nonVolatileMemoryHandle;
             if (PEWCoreLogicalCore.LastPEWCoreLogicalCoreUpdate == null)
-                return;
+                return nonVolatileMemoryHandle;
             if (!Initialized)
             {
                 Initialized = true;
@@ -61,11 +60,12 @@ namespace PEWCore
             {
                 if (DateTime.Now - p.Value.Item2 > TimeSpan.FromSeconds(p.Value.Item3))
                 {
-                    MyAPIGateway.Utilities.ShowMessage("dbg","Scheduler");
-                    int temp = ProcessLogicalCore(p.Value.Item1);
-                    if (temp != 0) 
+                    //MyAPIGateway.Utilities.ShowMessage("dbg","Scheduler");
+                    MyTuple<int, PEWCoreNonVolatileMemory> temp = ProcessLogicalCore(p.Value.Item1, nonVolatileMemoryHandle);
+                    if (temp.Item1 != 0) 
                     {
-                        updatelist.Add(p.Key, temp);
+                        updatelist.Add(p.Key, temp.Item1);
+                        nonVolatileMemoryHandle = temp.Item2;
                     }
                     else
                     {
@@ -82,27 +82,26 @@ namespace PEWCore
             }
 
             updatelist.Clear();
+            return nonVolatileMemoryHandle;
         }
 
         private static void Initialize()
         {
-            //MyAPIGateway.Utilities.ShowMessage("PEW HVT Subsystem", "Detector Initialization...");
-            MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | Initialize]", "Initialize");
-            PEWCoreLogging.Instance.WriteLine("[PEWCoreLogicalCoreProcess | Initialize] Initialize");
-            //MyVisualScriptLogicProvider.SendChatMessageColored("PEW HVT Subsystem: Detector Initialization...", VRageMath.Color.White);
+            PEWCoreLogging.Instance.WriteLine("[PEWCoreLogicalCoreProcess | Initialize] Execute");
+            if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCoreLogicalCoreProcess | Initialize] Execute", VRageMath.Color.White); }
             updatelist = new Dictionary<IMyEntity, int>();
         }
 
-        private static int ProcessLogicalCore(IMyEntity entity)
+        private static MyTuple<int, PEWCoreNonVolatileMemory> ProcessLogicalCore(IMyEntity entity, PEWCoreNonVolatileMemory nonVolatileMemory)
         {
             //Sanity check
             if (!(entity is IMyProgrammableBlock))
-                return 0;
+                return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
 
-            //IMyEntity parent is the entity
+            //IMyEntity parent is the parent entity of the logical core entity
             IMyEntity parent = entity.GetTopMostParent();
 
-            // Handle for beacon object
+            // Handle for logical core
             IMyProgrammableBlock CurrentPEWCoreLogicalCore = (IMyProgrammableBlock)entity;
 
             // Logical core needs to be on and working to continue
@@ -116,9 +115,12 @@ namespace PEWCore
                 case "Undefined":
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | ProcessLogicalCore]", "Switch segment: Standard undefined InsSet");
                     CurrentPEWCoreLogicalCore.CustomData = "istr0:Undefined*";
-                    return 1;
+                    return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
                 default:
-                    return PEWCoreProgramLibrary.LoadAndExecuteProgram(entity, instructionArray);
+                    {
+                        MyTuple<int, PEWCoreNonVolatileMemory> result = PEWCoreExecutableLibrary.LoadAndExecuteProgram(entity, instructionArray, nonVolatileMemory);
+                        if (result.Item1 == 0) { CurrentPEWCoreLogicalCore.CustomData = "istr0:Undefined*"; return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); } else { return new MyTuple<int, PEWCoreNonVolatileMemory>(result.Item1, result.Item2); }
+                    }
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | ProcessLogicalCore]", "Switch segment: Default");
             }
         }
