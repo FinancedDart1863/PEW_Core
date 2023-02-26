@@ -15,6 +15,7 @@ namespace PEWCore
         public PEWKOTHConfig PEWKOTHConfig = new PEWKOTHConfig();
     }
 
+    [ProtoContract(UseProtoMembersOnly = true)]
     public class PEWGeneralConfig
     {
         [ProtoMember(1)]
@@ -33,6 +34,8 @@ namespace PEWCore
         public bool PEWKOTH_ModuleEnable = true; //Enable/disable the HVT subsystem. Do not touch this if you don't know know what you're doing. (Disabling this may cause modules with HVT subsystem dependencies to fail, such as the safezone subsystem)
         [ProtoMember(8)]
         public int PEWKOTH_ExecutionInterval = 1; // Execution interval for module logic in seconds. Do not touch this if you don't know know what you're doing.
+        [ProtoMember(9)]
+        public int PEWCore_NonVolatileProgramMemory_FlushInterval = 60; ////Set time between flushes of logical core memory to 1 minuted (assuming PEWCoreExecutionInterval = 1)
     }
 
     [ProtoContract(UseProtoMembersOnly = true)]
@@ -98,7 +101,7 @@ namespace PEWCore
         public int PEWKOTH_Hill1AwardItem3Interval = 300; //Delay in seconds between dispensing of this award item 3 into the controlling factions container
         [ProtoMember(24)]
         public int PEWKOTH_Hill1AwardItem3Amount = 1; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
-        
+
         [ProtoMember(25)]
         public bool PEWKOTH_Hill2Enable = true; //Do we enable hill 2?
         [ProtoMember(26)]
