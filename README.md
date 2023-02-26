@@ -5,8 +5,10 @@
 Central unified project for Phobos Engineered Weaponry multiplayer.
 
 Planned core features:
+- Program/Module execution scheduler with dynamic execution intervals
+- Dynamic memory manager for both shared/nonshared memory for program/modules with flushing/loading to/from disk
+- Modular implementation of critical gameplay mechanics (Programs/Modules)
 - Standardized client-server communication library
-- Modular implementation of critical gameplay mechanics
 - Unified configuration
 - Unified logging
 
