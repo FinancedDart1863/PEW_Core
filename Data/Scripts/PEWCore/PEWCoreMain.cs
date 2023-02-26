@@ -1,5 +1,12 @@
 ﻿//© 2023 FinancedDart
 //© 2023 Phobos Engineered Weaponry Group
+using System.Collections;
+using PEWCore.Network;
+using Sandbox.ModAPI;
+using VRage;
+using VRage.Game.Components;
+using System.IO;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +18,13 @@ using Sandbox.Common.ObjectBuilders;
 using Sandbox.Definitions;
 using Sandbox.Engine;
 using Sandbox.Game;
-using Sandbox.ModAPI;
 
-using VRage.Game.Components;
 using VRage.Game;
 using VRage.Game.ModAPI;
 using Sandbox.Game.GUI;
 using VRage.Game.ObjectBuilders.Definitions;
 using ProtoBuf;
-using PEWCore.Network;
+using VRage.Serialization;
 
 namespace PEWCore
 {
@@ -39,15 +44,15 @@ namespace PEWCore
     public class PEWCoreMain : MySessionComponentBase
     {
         //Prepare to read configuration file
-        public PEWCoreConfig ConfigData; //All configuration data will become accessible via this handle
+        public static PEWCoreConfig ConfigData; //All configuration data will become accessible via this handle
+        public PEWCoreNonVolatileMemory PEWCoreNonVolatileMemory; //Nonvolatile program memory is accessible via this handle
         private const string CONFIG_FILE_NAME = "PEWCoreConfig.xml";
+        private const string PROGRAM_MEM_NONVOLATILE = "PEWCoreProgramMemory.mem";
 
-
-        //PEWCore is heavily driven by PEWCoreLogicalCores, we setup timing to check for them
-        private static DateTime lastUpdate;
-
-        //Initialized flag for PEWCore basis
-        private bool CoreInitialized;
+        private static DateTime lastUpdate; //PEWCore is heavily driven by PEWCoreLogicalCores, we setup to check timing with respect to their execution intervals
+        private bool CoreInitialized; //Initialized flag for PEWCore basis
+        private int NonVolatileFlushInterval = 60; //Default flush interval for nonvolatile memory to disk is 1 minute
+        private int NonVolatileFlushLast = 0;
 
         //Allocate channel 42747 for PEWCore network communications system
         public PEWNetworkMain PEWNetworkHandle = new PEWNetworkMain(42747);
@@ -61,16 +66,18 @@ namespace PEWCore
             if (!MyAPIGateway.Multiplayer.IsServer) //Execute the following if we are client
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | Initialize] Execute client code");
-                MyAPIGateway.Utilities.ShowMessage("PCCore", "Client mode");
+                MyAPIGateway.Utilities.ShowMessage("PCCore", "[Client]");
             }
 
             if (MyAPIGateway.Multiplayer.IsServer) //Execute the following if we are server
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | Initialize] Execute server code");
-                MyAPIGateway.Utilities.ShowMessage("PCCore", "Server mode");
+                MyAPIGateway.Utilities.ShowMessage("PCCore", "[Server]");
             }
 
             ReadConfig(); //Both clients and servers read config, but clients will have ConfigData overwritten with synchronization packet from server
+
+            InitMemory(); //Start memory management
 
             lastUpdate = DateTime.Now;
         }
@@ -84,43 +91,101 @@ namespace PEWCore
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Server execute block");
                 if (!MyAPIGateway.Utilities.FileExistsInWorldStorage(CONFIG_FILE_NAME, typeof(PEWCoreConfig)))
                 {
-                    PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Configuration XML file doesn't exist. Try to create a new one.");
+                    PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Configuration XML file doesn't exist. Attempting to create a new one");
                     MyAPIGateway.Parallel.Start(() =>
                     {
                         using (var sw = MyAPIGateway.Utilities.WriteFileInWorldStorage(CONFIG_FILE_NAME, typeof(PEWCoreConfig))) sw.Write(MyAPIGateway.Utilities.SerializeToXML<PEWCoreConfig>(new PEWCoreConfig()));
                     });
-                }
-
-                //Attempt to read the configuration file
-                try
-                {
-                    PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Attempting to read existing configuration XML");
-                    ConfigData = null;
-                    var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage(CONFIG_FILE_NAME, typeof(PEWCoreConfig));
-                    string configcontents = reader.ReadToEnd();
-                    ConfigData = MyAPIGateway.Utilities.SerializeFromXML<PEWCoreConfig>(configcontents);
-
-                    byte[] bytes = MyAPIGateway.Utilities.SerializeToBinary(ConfigData);
-                    string encodedConfig = Convert.ToBase64String(bytes);
-
-                    MyAPIGateway.Utilities.SetVariable("PEWCoreConfig", encodedConfig);
-                }
-                catch (Exception exc)
-                {
-                    PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Error: Could not read configuration XML document");
                     ConfigData = new PEWCoreConfig();
+                }
+                else
+                {
+                    //Attempt to read the configuration file
+                    try
+                    {
+                        PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Attempting to read existing configuration XML");
+                        ConfigData = null;
+                        var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage(CONFIG_FILE_NAME, typeof(PEWCoreConfig));
+                        string configcontents = reader.ReadToEnd();
+                        ConfigData = MyAPIGateway.Utilities.SerializeFromXML<PEWCoreConfig>(configcontents);
+                        PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Success");
+                    }
+                    catch (Exception exc)
+                    {
+                        PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Error: Could not read configuration XML document. Exception: " + exc.ToString());
+                        ConfigData = new PEWCoreConfig();
+                    }
                 }
             }
             else
             {
-                ConfigData = new PEWCoreConfig(); //Don't bother with configuration files if client. Just load default ConfigData and wait for synchronization from server
+                ConfigData = new PEWCoreConfig(); //If client, just load default ConfigData and wait for synchronization from server
+                ConfigData.PEWGeneralConfig.DeveloperMode = false; //Don't show developer output on clients
             }
+
+            NonVolatileFlushInterval = ConfigData.PEWGeneralConfig.PEWCore_NonVolatileProgramMemory_FlushInterval;
 
             if (ConfigData.PEWGeneralConfig.DeveloperMode)
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Developer mode is enabled");
                 MyAPIGateway.Utilities.ShowMessage("PCCore", "Developer mode enabled");
             }
+        }
+
+        public void InitMemory()
+        {
+            PEWCoreLogging.Instance.WriteLine("[PEWCore | InitMemory]");
+            if (ConfigData.PEWGeneralConfig.DeveloperMode) {MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCore | InitMemory] Execution", VRageMath.Color.White);}
+            if (MyAPIGateway.Session.IsServer)
+            {
+                PEWCoreLogging.Instance.WriteLine("[PEWCore | InitMemory] Server execute block");
+                if (!MyAPIGateway.Utilities.FileExistsInWorldStorage(PROGRAM_MEM_NONVOLATILE, typeof(PEWCoreNonVolatileMemory)))
+                {
+                    PEWCoreLogging.Instance.WriteLine("[PEWCore | InitMemory] Nonvolatile program storage file not detected. Attempting to create a blank one");
+                    MyAPIGateway.Parallel.Start(() =>
+                    {
+                        using (var sw = MyAPIGateway.Utilities.WriteFileInWorldStorage(PROGRAM_MEM_NONVOLATILE, typeof(PEWCoreNonVolatileMemory))) sw.Write(MyAPIGateway.Utilities.SerializeToXML<PEWCoreNonVolatileMemory>(new PEWCoreNonVolatileMemory()));
+                    });
+                    PEWCoreNonVolatileMemory = new PEWCoreNonVolatileMemory();
+                }
+                else
+                {
+                    //Attempt to read the nonvolatile program storage file
+                    try
+                    {
+                        PEWCoreLogging.Instance.WriteLine("[PEWCore | InitMemory] Attempting to read existing nonvolatile program storage file");
+                        PEWCoreNonVolatileMemory = null;
+                        var reader = MyAPIGateway.Utilities.ReadFileInWorldStorage(PROGRAM_MEM_NONVOLATILE, typeof(PEWCoreNonVolatileMemory));
+                        string nonvolatilememory = reader.ReadToEnd();
+                        PEWCoreNonVolatileMemory = MyAPIGateway.Utilities.SerializeFromXML<PEWCoreNonVolatileMemory>(nonvolatilememory);
+                        PEWCoreLogging.Instance.WriteLine("[PEWCore | ReadConfig] Success");
+                    }
+                    catch (Exception exc)
+                    {
+                        PEWCoreLogging.Instance.WriteLine("[PEWCore | InitMemory] Error: Could not read nonvolatile program storage file. Exception: " + exc.ToString());
+                        PEWCoreNonVolatileMemory = new PEWCoreNonVolatileMemory();
+                    }
+                }
+                //Generate sample entries. Programs and modules can dynamically size (if needed, otherwise static) the type arrays according to their logic
+                /*
+                bool[] defaultBoolArray = new bool[3] { false, false, false };
+                bool[] defaultBoolArray2 = new bool[5] { false, false, false, false, false};
+                string[] defaultStringArray = new string[3] {"string1", "string2", "string3"};
+                int[] defaultIntArray = new int[3] {1, 2, 3};
+                MyTuple<string, string[], bool[], int[]> tuple = new MyTuple<string, string[], bool[], int[]>("test", defaultStringArray, defaultBoolArray, defaultIntArray);
+                MyTuple<string, string[], bool[], int[]> tuple2 = new MyTuple<string, string[], bool[], int[]>("test", defaultStringArray, defaultBoolArray2, defaultIntArray);
+                PEWCoreNonVolatileMemoryHandle.NonVolatileMemory.Dictionary.Add("1127537383970307059", tuple);
+                PEWCoreNonVolatileMemoryHandle.NonVolatileMemory.Dictionary.Add("1127537383970307060", tuple2);
+                */
+            }
+        }
+
+        public void FlushNonVolatileMemory(PEWCoreNonVolatileMemory memory)
+        {
+            MyAPIGateway.Parallel.Start(() =>
+            {
+                using (var sw = MyAPIGateway.Utilities.WriteFileInWorldStorage(PROGRAM_MEM_NONVOLATILE, typeof(PEWCoreNonVolatileMemory))) sw.Write(MyAPIGateway.Utilities.SerializeToXML<PEWCoreNonVolatileMemory>(memory));
+            });
         }
 
         public override void BeforeStart()
@@ -146,6 +211,17 @@ namespace PEWCore
             if (DateTime.Now - lastUpdate > TimeSpan.FromSeconds(PEWCoreSettings.PEWCoreExecutionInterval))
             {
 
+                //Flush nonvolatile memory to disk according to NonVolatileFlushInterval | ConfigData.PEWGeneralConfig.PEWCore_NonVolatileProgramMemory_FlushInterval
+                if (NonVolatileFlushLast <= NonVolatileFlushInterval)
+                {
+                    NonVolatileFlushLast++;
+                }
+                else
+                {
+                    FlushNonVolatileMemory(PEWCoreNonVolatileMemory);
+                    NonVolatileFlushLast = 0;
+                }
+
                 //Client side execution routines
                 if (!MyAPIGateway.Multiplayer.IsServer) //Execute code if server
                 {
@@ -158,7 +234,7 @@ namespace PEWCore
 
                 //Process logical cores [Server]
                 if (MyAPIGateway.Multiplayer.IsServer)
-                    PEWCoreLogicalCoreProcess.Process();
+                    PEWCoreNonVolatileMemory = PEWCoreLogicalCoreProcess.Process(PEWCoreNonVolatileMemory);
 
 
                 lastUpdate = DateTime.Now;
