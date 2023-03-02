@@ -104,22 +104,16 @@ namespace PEWCore.Programs
                                     if (currentContainer.CustomName.Equals(containerReferenceName))
                                     {
                                         VRage.Game.ModAPI.IMyInventory inventory = currentContainer.GetInventory();
-                                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("here1 ", VRageMath.Color.White);
                                         //Valid type and object for item 1
                                         if (dispenseItem1 != "Null" && dispenseItem1Type != "Null")
                                         {
-                                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("here2 ", VRageMath.Color.White);
                                             if (!item1Intervaled)
                                             {
-                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("here3 ", VRageMath.Color.White);
                                                 if (timeSinceLastFullCompletion >= dispenseItem1Interval)
                                                 {
-                                                    Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("here4 ", VRageMath.Color.White);
-                                                    Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("dbgitem1 ", VRageMath.Color.White);
                                                     switch (dispenseItem1Type)
                                                     {
                                                         case "Component":
-                                                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("dbgitem1component ", VRageMath.Color.White);
                                                             BTDispenserAddComponent(programDirective, inventory, new MyItemType("MyObjectBuilder_Component", dispenseItem1), dispenseItem1, dispenseItem1IntervalAmount, dispenseItem1MaxAtOnceAmount);
                                                             break;
                                                         case "PhysicalObject":
@@ -215,12 +209,6 @@ namespace PEWCore.Programs
                                                 }
                                             }
                                         } else { item3Intervaled = true; }
-                                        //MyObjectBuilder_
-                                        //MyItemType steelPlateType = new MyItemType("MyObjectBuilder_Component", "SteelPlate");
-                                        //MyItemType ironIngotType = new MyItemType
-                                        //Try to add item1
-
-                                        //if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { MyVisualScriptLogicProvider.SendChatMessageColored("[Program | BasicTimedDispenser] Container found", VRageMath.Color.White); }
                                     }
                                 }
                             }
@@ -255,19 +243,14 @@ namespace PEWCore.Programs
 
         public static void BTDispenserAddComponent(string programDirective, VRage.Game.ModAPI.IMyInventory inventory, MyItemType componentType, string dispenseItem, int dispenseItemIntervalAmount, int dispenseItemMaxAtOnceAmount)
         {
-            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("dbg0 ", VRageMath.Color.White);
             if (programDirective.Equals("TopOff"))
             {
-                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("dbg1 ", VRageMath.Color.White);
                 if (inventory.GetItemAmount(componentType) < dispenseItemMaxAtOnceAmount)
                 {
-                    Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("dbg2 ", VRageMath.Color.White);
                     if ((inventory.GetItemAmount(componentType) + dispenseItemIntervalAmount) > dispenseItemMaxAtOnceAmount)
                     {
-                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("dbg3 ", VRageMath.Color.White);
                         if (inventory.CanItemsBeAdded(dispenseItemMaxAtOnceAmount - inventory.GetItemAmount(componentType), componentType))
                         {
-                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("dbg4 ", VRageMath.Color.White);
                             inventory.AddItems(dispenseItemMaxAtOnceAmount - inventory.GetItemAmount(componentType), new MyObjectBuilder_Component() { SubtypeName = dispenseItem });
                         }
                     }
