@@ -121,7 +121,6 @@ namespace PEWCore
                         MyTuple<int, PEWCoreNonVolatileMemory> result = PEWCoreExecutableLibrary.LoadAndExecuteProgram(entity, instructionArray, nonVolatileMemory);
                         if (result.Item1 == 0) { CurrentPEWCoreLogicalCore.CustomData = "istr0:Undefined*"; return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); } else { return new MyTuple<int, PEWCoreNonVolatileMemory>(result.Item1, result.Item2); }
                     }
-                    //MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | ProcessLogicalCore]", "Switch segment: Default");
             }
         }
 
@@ -132,6 +131,7 @@ namespace PEWCore
             {
                 //MyAPIGateway.Utilities.ShowMessage("dbg","debug1");
                 return new String[20] {"Undefined", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
+                if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCore | LogicalCoreReadCustomData] New logical core or illegal instruction set", VRageMath.Color.White); }
             }
             else
             {
@@ -146,7 +146,8 @@ namespace PEWCore
                     string instructionLineHeader = instructionLinePrefix + tempString + ":";
                     if (customData.Contains(instructionLineHeader))
                     {
-                        int pos = customData.IndexOf(instructionLineHeader) + 6;
+                        int pos = 0;
+                        if (x <= 9) { pos = customData.IndexOf(instructionLineHeader) + 6; } else { pos = customData.IndexOf(instructionLineHeader) + 7; }
                         string minString = customData.Substring(pos, customData.Length - pos);
                         for (int r = 0; r < minString.Length; r++)
                         {
@@ -166,7 +167,7 @@ namespace PEWCore
                             }
                             if (r == (minString.Length - 1))
                             {
-                                //MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | LogicalCoreReadCustomData]", "Illegal instruction escape!");
+                                if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCore | LogicalCoreReadCustomData] Invalid or illegal instruction set", VRageMath.Color.White); }
                                 return new String[20] { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
                             }
                         }
