@@ -35,7 +35,7 @@ namespace PEWCore
         [ProtoMember(8)]
         public int PEWKOTH_ExecutionInterval = 1; // Execution interval for module logic in seconds. Do not touch this if you don't know know what you're doing.
         [ProtoMember(9)]
-        public int PEWCore_NonVolatileProgramMemory_FlushInterval = 60; ////Set time between flushes of logical core memory to 1 minuted (assuming PEWCoreExecutionInterval = 1)
+        public int PEWCore_NonVolatileProgramMemory_FlushInterval = 20; ////Set time between flushes of logical core memory to 1 minuted (assuming PEWCoreExecutionInterval = 1)
     }
 
     [ProtoContract(UseProtoMembersOnly = true)]

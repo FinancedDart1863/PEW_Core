@@ -51,7 +51,7 @@ namespace PEWCore
 
         private static DateTime lastUpdate; //PEWCore is heavily driven by PEWCoreLogicalCores, we setup to check timing with respect to their execution intervals
         private bool CoreInitialized; //Initialized flag for PEWCore basis
-        private int NonVolatileFlushInterval = 60; //Default flush interval for nonvolatile memory to disk is 1 minute
+        private int NonVolatileFlushInterval = 20; //Default flush interval for nonvolatile memory to disk is 1 minute
         private int NonVolatileFlushLast = 0;
 
         //Allocate channel 42747 for PEWCore network communications system
@@ -211,16 +211,6 @@ namespace PEWCore
             if (DateTime.Now - lastUpdate > TimeSpan.FromSeconds(PEWCoreSettings.PEWCoreExecutionInterval))
             {
 
-                //Flush nonvolatile memory to disk according to NonVolatileFlushInterval | ConfigData.PEWGeneralConfig.PEWCore_NonVolatileProgramMemory_FlushInterval
-                if (NonVolatileFlushLast <= NonVolatileFlushInterval)
-                {
-                    NonVolatileFlushLast++;
-                }
-                else
-                {
-                    FlushNonVolatileMemory(PEWCoreNonVolatileMemory);
-                    NonVolatileFlushLast = 0;
-                }
 
                 //Client side execution routines
                 if (!MyAPIGateway.Multiplayer.IsServer) //Execute code if server
@@ -234,7 +224,20 @@ namespace PEWCore
 
                 //Process logical cores [Server]
                 if (MyAPIGateway.Multiplayer.IsServer)
+                {
                     PEWCoreNonVolatileMemory = PEWCoreLogicalCoreProcess.Process(PEWCoreNonVolatileMemory);
+
+                    //Flush nonvolatile memory to disk according to NonVolatileFlushInterval | ConfigData.PEWGeneralConfig.PEWCore_NonVolatileProgramMemory_FlushInterval
+                    if (NonVolatileFlushLast <= NonVolatileFlushInterval)
+                    {
+                        NonVolatileFlushLast++;
+                    }
+                    else
+                    {
+                        NonVolatileFlushLast = 0;
+                        FlushNonVolatileMemory(PEWCoreNonVolatileMemory);
+                    }
+                }
 
 
                 lastUpdate = DateTime.Now;
