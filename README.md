@@ -38,10 +38,14 @@ Steam Workshop: [Not yet available]
 
 ## Copyright
 
+The IP contained herein is copyrighted by the following authors.
+Permission has been obtained from all listed authors for usage of their intellectual property and modified/customized versions of such IP within this mod.
+
 © 2023 FinancedDart <br />
 © 2023 Phobos Engineered Weaponry Group <br />
 © 2023 Sadragos (Affiliate - Tiered Tech) <br />
 © 2023 spiritplumber (Affiliate - Active Radar) <br />
+© 2023 Echthros (Affifiate - Larger Explosions/Nuclear Weapons <br />
 
 You are not permitted to use code from this repository without my express permission. Unauthorized re-use, re-upload, or duplication of this code and/or SE mod will
 result in a DMCA and legal action. Contact me for permission requests and any questions. Any derivative mods for which permission has been granted must be unlisted.
