@@ -70,13 +70,13 @@ namespace PEWCore
             if (!MyAPIGateway.Multiplayer.IsServer) //Execute the following if we are client
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | Initialize] Execute client code");
-                MyAPIGateway.Utilities.ShowMessage("PCCore", "[Client]");
+                MyAPIGateway.Utilities.ShowMessage("PEWCore", "Client start");
             }
 
             if (MyAPIGateway.Multiplayer.IsServer) //Execute the following if we are server
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | Initialize] Execute server code");
-                MyAPIGateway.Utilities.ShowMessage("PCCore", "[Server]");
+                MyAPIGateway.Utilities.ShowMessage("PEWCore", "[Server start] © 2023 Phobos Engineered Weaponry Group");
                 //PEWNetworkGPSManager.initialization();
                 InitMemory(); //Start memory management
             }

@@ -25,7 +25,7 @@ namespace PEWCore
         [ProtoMember(3)]
         public string PEWCore_Faction3Tag = "xxxxx"; //Tag of faction 3
         [ProtoMember(4)]
-        public bool DeveloperMode = true; //In developer mode, code execution is described in the in-game chat
+        public bool DeveloperMode = false; //In developer mode, code execution is described in the in-game chat
         [ProtoMember(5)]
         public bool PEWHVT_ModuleEnable = true; //Enable/disable the HVT subsystem. Do not touch this if you don't know know what you're doing. (Disabling this may cause modules with HVT subsystem dependencies to fail, such as the safezone subsystem)
         [ProtoMember(6)]

@@ -22,7 +22,7 @@ namespace PEWCore
             //The result is forwarded back to the scheduler so the logic can adjust its execution interval if needed.
             //Note the returning a positive execution indication will cause the nonvolatile memory to be updated
             int result = 1;
-            MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | Switch]", instructionSet[0]);
+            //MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | Switch]", instructionSet[0]);
             switch (instructionSet[0])
             {
                 case "Undefined":
@@ -30,10 +30,10 @@ namespace PEWCore
                 case "BasicTimedDispenser":
                     return PEWCoreProgram_BasicTimedDispenser.execute(entity, instructionSet, nonVolatileMemory);
                 case "GeneralFactionAssigner":
-                    MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | GeneralFactionAssigner]", "GeneralFactionAssigner");
+                    //MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | GeneralFactionAssigner]", "GeneralFactionAssigner");
                     return PEWCoreProgram_GeneralFactionAssigner.execute(entity, instructionSet, nonVolatileMemory);
                 case "PEWCoreKOTH":
-                    MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | PEWCoreKOTHExecute]", "PEWCoreKOTH");
+                    //MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | PEWCoreKOTHExecute]", "PEWCoreKOTH");
                     return PEWCoreModule_KOTH.execute(entity, instructionSet, nonVolatileMemory);
                 default:
                     return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
