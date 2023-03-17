@@ -35,7 +35,7 @@ namespace PEWCore.Network
         }
 
         //Register packet monitoring. Do so for both client server as per execution trace until this point
-        public void Register()
+        public  void Register()
         {
             MyAPIGateway.Multiplayer.RegisterMessageHandler(allocatedChannel, ReceivedPacket);
         }
