@@ -56,12 +56,16 @@ namespace PEWCore
 
         //Allocate channel 42747 for PEWCore network communications system
         public PEWNetworkMain PEWNetworkHandle = new PEWNetworkMain(42747);
+        public PEWNetworkGPSManager PEWNetworkGPSManager = new PEWNetworkGPSManager();
 
         private void Initialize()
         {
             CoreInitialized = true;
 
-            //SetupNetwork();
+            //Network is setup by everyone
+            //PEWNetworkHandle.Register();
+
+            ReadConfig(); //Both clients and servers read config, but clients will have ConfigData overwritten with synchronization packet from server
 
             if (!MyAPIGateway.Multiplayer.IsServer) //Execute the following if we are client
             {
@@ -73,11 +77,9 @@ namespace PEWCore
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | Initialize] Execute server code");
                 MyAPIGateway.Utilities.ShowMessage("PCCore", "[Server]");
+                //PEWNetworkGPSManager.initialization();
+                InitMemory(); //Start memory management
             }
-
-            ReadConfig(); //Both clients and servers read config, but clients will have ConfigData overwritten with synchronization packet from server
-
-            InitMemory(); //Start memory management
 
             lastUpdate = DateTime.Now;
         }
@@ -213,8 +215,10 @@ namespace PEWCore
 
 
                 //Client side execution routines
-                if (!MyAPIGateway.Multiplayer.IsServer) //Execute code if server
+                if (!MyAPIGateway.Multiplayer.IsServer) //Execute code if client
                 {
+                    //MyAPIGateway.Gui.
+                    //PEWCoreClient.ClientUpdateWorldGPSWaypoints();
                 }
 
                 //Server side execution routines
