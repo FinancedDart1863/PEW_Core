@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using PEWCore.Modules;
 using PEWCore.Programs;
 using Sandbox.ModAPI;
 using VRage;
@@ -27,8 +28,13 @@ namespace PEWCore
                 case "Undefined":
                     return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
                 case "BasicTimedDispenser":
-                    MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | BasicTimedDispenserExecute]", "BasicTimedDispenser");
                     return PEWCoreProgram_BasicTimedDispenser.execute(entity, instructionSet, nonVolatileMemory);
+                case "GeneralFactionAssigner":
+                    MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | GeneralFactionAssigner]", "GeneralFactionAssigner");
+                    return PEWCoreProgram_GeneralFactionAssigner.execute(entity, instructionSet, nonVolatileMemory);
+                case "PEWCoreKOTH":
+                    MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | PEWCoreKOTHExecute]", "PEWCoreKOTH");
+                    return PEWCoreModule_KOTH.execute(entity, instructionSet, nonVolatileMemory);
                 default:
                     return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
             }
