@@ -250,59 +250,56 @@ namespace PEWCore.Programs
 
                 for (int x = 0; x < connectedPlayers.Count; x++)
                 {
-                    /*
                     if (connectedPlayers[x].PromoteLevel == MyPromoteLevel.Admin || connectedPlayers[x].PromoteLevel == MyPromoteLevel.Owner)
                     {
-                        MyAPIGateway.Utilities.ShowMessage("DBG", "here1");
+                        //MyAPIGateway.Utilities.ShowMessage("DBG", "here1");
                     }
                     else
                     {
-                    */
-                    
-                    IMyFaction currentPlayerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(connectedPlayers[x].PlayerID);
-                    string currentPlayerFactionTag = "";
-                    if (currentPlayerFaction != null)
-                    {
-                        currentPlayerFactionTag = currentPlayerFaction.Tag;
-                    }
-                    if (!(thisProgramMemoryStrings.Contains(connectedPlayersSteamID[x].ToString())))
-                    {
-                        //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerNotRegistered");
-                        if (currentPlayerFactionTag == "") {
-                            //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerNotInFaction");
-                        }
-                        else
+                        IMyFaction currentPlayerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(connectedPlayers[x].PlayerID);
+                        string currentPlayerFactionTag = "";
+                        if (currentPlayerFaction != null)
                         {
-                            //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerInFaction");
-                            if (currentPlayerFactionTag == "SPRT" || currentPlayerFactionTag == "SPID")
-                            {
-                                MyVisualScriptLogicProvider.KickPlayerFromFaction(connectedPlayers[x].PlayerID);
+                            currentPlayerFactionTag = currentPlayerFaction.Tag;
+                        }
+                        if (!(thisProgramMemoryStrings.Contains(connectedPlayersSteamID[x].ToString())))
+                        {
+                            //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerNotRegistered");
+                            if (currentPlayerFactionTag == "") {
+                                //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerNotInFaction");
                             }
                             else
                             {
-                                int temp = thisProgramMemoryStrings.Length;
-                                Array.Resize(ref thisProgramMemoryStrings, thisProgramMemoryStrings.Length + 2);
-                                thisProgramMemoryStrings[temp] = connectedPlayersSteamID[x].ToString();
-                                thisProgramMemoryStrings[temp + 1] = currentPlayerFactionTag;
+                                //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerInFaction");
+                                if (currentPlayerFactionTag == "SPRT" || currentPlayerFactionTag == "SPID")
+                                {
+                                    MyVisualScriptLogicProvider.KickPlayerFromFaction(connectedPlayers[x].PlayerID);
+                                }
+                                else
+                                {
+                                    int temp = thisProgramMemoryStrings.Length;
+                                    Array.Resize(ref thisProgramMemoryStrings, thisProgramMemoryStrings.Length + 2);
+                                    thisProgramMemoryStrings[temp] = connectedPlayersSteamID[x].ToString();
+                                    thisProgramMemoryStrings[temp + 1] = currentPlayerFactionTag;
+                                }
                             }
-                        }
-                    } 
-                    else
-                    {
-                        //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerRegistered");
-                        int playerRegistryIndex = Array.IndexOf(thisProgramMemoryStrings, connectedPlayersSteamID[x].ToString());
-                        string playerRegisteredFactionTag = thisProgramMemoryStrings[(playerRegistryIndex + 1)];
-                        if (currentPlayerFactionTag != playerRegisteredFactionTag)
+                        } 
+                        else
                         {
-                            //MyAPIGateway.Utilities.ShowMessage("DBG", "Lock player to faction");
-                            if (playerRegisteredFactionTag != "")
+                            //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerRegistered");
+                            int playerRegistryIndex = Array.IndexOf(thisProgramMemoryStrings, connectedPlayersSteamID[x].ToString());
+                            string playerRegisteredFactionTag = thisProgramMemoryStrings[(playerRegistryIndex + 1)];
+                            if (currentPlayerFactionTag != playerRegisteredFactionTag)
                             {
-                                MyVisualScriptLogicProvider.KickPlayerFromFaction(connectedPlayers[x].PlayerID);
+                                //MyAPIGateway.Utilities.ShowMessage("DBG", "Lock player to faction");
+                                if (playerRegisteredFactionTag != "")
+                                {
+                                    MyVisualScriptLogicProvider.KickPlayerFromFaction(connectedPlayers[x].PlayerID);
+                                }
+                                MyAPIGateway.Session.Factions.SendJoinRequest(MyAPIGateway.Session.Factions.TryGetFactionByTag(playerRegisteredFactionTag).FactionId, connectedPlayers[x].PlayerID);
+                                MyAPIGateway.Session.Factions.AcceptJoin(MyAPIGateway.Session.Factions.TryGetFactionByTag(playerRegisteredFactionTag).FactionId, connectedPlayers[x].PlayerID);
                             }
-                            MyAPIGateway.Session.Factions.SendJoinRequest(MyAPIGateway.Session.Factions.TryGetFactionByTag(playerRegisteredFactionTag).FactionId, connectedPlayers[x].PlayerID);
-                            MyAPIGateway.Session.Factions.AcceptJoin(MyAPIGateway.Session.Factions.TryGetFactionByTag(playerRegisteredFactionTag).FactionId, connectedPlayers[x].PlayerID);
                         }
-                    //}
                     }
                 }
 
