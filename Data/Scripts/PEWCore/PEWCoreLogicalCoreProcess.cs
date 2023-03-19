@@ -42,13 +42,13 @@ namespace PEWCore
         internal static System.Timers.Timer clearTimer = new System.Timers.Timer();
 
         //Process logical cores
-        public static PEWCoreNonVolatileMemory Process(PEWCoreNonVolatileMemory nonVolatileMemoryHandle)
+        public static MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory> Process(PEWCoreVolatileMemory volatileMemoryHandle,PEWCoreNonVolatileMemory nonVolatileMemoryHandle)
         {
             //Sanity check
             if (MyAPIGateway.Session == null)
-                return nonVolatileMemoryHandle;
+                return new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemoryHandle, nonVolatileMemoryHandle);
             if (PEWCoreLogicalCore.LastPEWCoreLogicalCoreUpdate == null)
-                return nonVolatileMemoryHandle;
+                return new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemoryHandle, nonVolatileMemoryHandle);
             if (!Initialized)
             {
                 Initialized = true;
@@ -61,11 +61,15 @@ namespace PEWCore
                 if (DateTime.Now - p.Value.Item2 > TimeSpan.FromSeconds(p.Value.Item3))
                 {
                     //MyAPIGateway.Utilities.ShowMessage("dbg","Scheduler");
-                    MyTuple<int, PEWCoreNonVolatileMemory> temp = ProcessLogicalCore(p.Value.Item1, nonVolatileMemoryHandle);
+                    MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory> memoryReturn = new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemoryHandle, nonVolatileMemoryHandle);
+                    MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>> temp = ProcessLogicalCore(p.Value.Item1, volatileMemoryHandle, nonVolatileMemoryHandle);
+                    volatileMemoryHandle = memoryReturn.Item1;
+                    nonVolatileMemoryHandle = memoryReturn.Item2;
                     if (temp.Item1 != 0) 
                     {
                         updatelist.Add(p.Key, temp.Item1);
-                        nonVolatileMemoryHandle = temp.Item2;
+                        volatileMemoryHandle = temp.Item2.Item1;
+                        nonVolatileMemoryHandle = temp.Item2.Item2;
                     }
                     else
                     {
@@ -82,7 +86,7 @@ namespace PEWCore
             }
 
             updatelist.Clear();
-            return nonVolatileMemoryHandle;
+            return new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemoryHandle, nonVolatileMemoryHandle);
         }
 
         private static void Initialize()
@@ -92,11 +96,11 @@ namespace PEWCore
             updatelist = new Dictionary<IMyEntity, int>();
         }
 
-        private static MyTuple<int, PEWCoreNonVolatileMemory> ProcessLogicalCore(IMyEntity entity, PEWCoreNonVolatileMemory nonVolatileMemory)
+        private static MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>> ProcessLogicalCore(IMyEntity entity, PEWCoreVolatileMemory volatileMemory, PEWCoreNonVolatileMemory nonVolatileMemory)
         {
             //Sanity check
             if (!(entity is IMyProgrammableBlock))
-                return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
 
             //IMyEntity parent is the parent entity of the logical core entity
             IMyEntity parent = entity.GetTopMostParent();
@@ -115,11 +119,12 @@ namespace PEWCore
                 case "Undefined":
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreLogicalCoreProcess | ProcessLogicalCore]", "Switch segment: Standard undefined InsSet");
                     CurrentPEWCoreLogicalCore.CustomData = "istr0:Undefined*";
-                    return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                    return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
                 default:
                     {
-                        MyTuple<int, PEWCoreNonVolatileMemory> result = PEWCoreExecutableLibrary.LoadAndExecuteProgram(entity, instructionArray, nonVolatileMemory);
-                        if (result.Item1 == 0) { CurrentPEWCoreLogicalCore.CustomData = "istr0:Undefined*"; return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); } else { return new MyTuple<int, PEWCoreNonVolatileMemory>(result.Item1, result.Item2); }
+                        MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>> result = PEWCoreExecutableLibrary.LoadAndExecuteProgram(entity, instructionArray, volatileMemory, nonVolatileMemory);
+                        if (result.Item1 == 0) { CurrentPEWCoreLogicalCore.CustomData = "istr0:Undefined*"; return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));} 
+                        else { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(result.Item1, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(result.Item2.Item1,result.Item2.Item2));}
                     }
             }
         }

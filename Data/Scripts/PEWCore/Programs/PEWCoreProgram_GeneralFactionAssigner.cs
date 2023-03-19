@@ -23,12 +23,35 @@ using VRage.Game.Components;
 using VRage.Game;
 using VRage.Game.ModAPI;
 using SpaceEngineers.Game.ModAPI;
+using System.Security.Cryptography.X509Certificates;
 
 namespace PEWCore.Programs
 {
+    public class PEWCoreProgram_GeneralFactionAssignerDelayedFaction
+    {
+        public IMyFaction faction;
+        public int runtime;
+
+        public PEWCoreProgram_GeneralFactionAssignerDelayedFaction(IMyFaction faction, int runtime)
+        {
+            this.faction = faction;
+            this.runtime = runtime;
+        }
+    }
+
     internal class PEWCoreProgram_GeneralFactionAssigner
     {
-        public static MyTuple<int, PEWCoreNonVolatileMemory> execute(VRage.ModAPI.IMyEntity entity, string[] instructionSet, PEWCoreNonVolatileMemory nonVolatileMemory)
+        public List<IMyPlayer> allPlayers = new List<IMyPlayer>();
+        public string factionButtonSubtype = "FactionButton";
+        public List<string> reuseSections = new List<string>();
+        public List<PEWCoreProgram_GeneralFactionAssignerDelayedFaction> delayedFactions = new List<PEWCoreProgram_GeneralFactionAssignerDelayedFaction>();
+        public List<string> specialFactions = new List<string>()
+        {
+            "SPRT",
+            "SPID"
+        };
+
+        public static MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>> execute(VRage.ModAPI.IMyEntity entity, string[] instructionSet, PEWCoreVolatileMemory volatileMemory,PEWCoreNonVolatileMemory nonVolatileMemory)
         {
             //We need to be careful in program code sections as failures, either with memory accesses or the logic itself, can crash the server. Everything needs to be in a try block.
             if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[Program | GeneralFactionAssigner] Execution", VRageMath.Color.White); }
@@ -38,7 +61,7 @@ namespace PEWCore.Programs
             try
             {
                 string programName = instructionSet[0];
-                try { ISspecifiedExecInterval = Int32.Parse(instructionSet[1]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
+                try { ISspecifiedExecInterval = Int32.Parse(instructionSet[1]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
                 string programDirective = instructionSet[2];
                 string faction1Tag = instructionSet[3];
                 string faction1ZoneAssignName = instructionSet[4];
@@ -209,12 +232,12 @@ namespace PEWCore.Programs
                         }
                     }
                 }
-                return new MyTuple<int, PEWCoreNonVolatileMemory>(ISspecifiedExecInterval, nonVolatileMemory);
+                return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(ISspecifiedExecInterval, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
             catch (Exception ex)
             {
                 MyAPIGateway.Utilities.ShowMessage("GeneralFactionAssigner]", "Execute failure");
-                return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
         }
     }

@@ -46,6 +46,7 @@ namespace PEWCore
         //Prepare to read configuration file
         public static PEWCoreConfig ConfigData; //All configuration data will become accessible via this handle
         public PEWCoreNonVolatileMemory PEWCoreNonVolatileMemory; //Nonvolatile program memory is accessible via this handle
+        public PEWCoreVolatileMemory PEWCoreVolatileMemory; //Volatile program memory is accessible via this handle
         private const string CONFIG_FILE_NAME = "PEWCoreConfig.xml";
         private const string PROGRAM_MEM_NONVOLATILE = "PEWCoreProgramMemory.mem";
 
@@ -140,6 +141,8 @@ namespace PEWCore
             if (ConfigData.PEWGeneralConfig.DeveloperMode) {MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCore | InitMemory] Execution", VRageMath.Color.White);}
             if (MyAPIGateway.Session.IsServer)
             {
+                PEWCoreVolatileMemory = new PEWCoreVolatileMemory();
+
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | InitMemory] Server execute block");
                 if (!MyAPIGateway.Utilities.FileExistsInWorldStorage(PROGRAM_MEM_NONVOLATILE, typeof(PEWCoreNonVolatileMemory)))
                 {
@@ -229,7 +232,10 @@ namespace PEWCore
                 //Process logical cores [Server]
                 if (MyAPIGateway.Multiplayer.IsServer)
                 {
-                    PEWCoreNonVolatileMemory = PEWCoreLogicalCoreProcess.Process(PEWCoreNonVolatileMemory);
+                    MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory> memoryReturn = new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(PEWCoreVolatileMemory, PEWCoreNonVolatileMemory);
+                    memoryReturn = PEWCoreLogicalCoreProcess.Process(PEWCoreVolatileMemory, PEWCoreNonVolatileMemory);
+                    PEWCoreVolatileMemory = memoryReturn.Item1;
+                    PEWCoreNonVolatileMemory = memoryReturn.Item2;
 
                     //Flush nonvolatile memory to disk according to NonVolatileFlushInterval | ConfigData.PEWGeneralConfig.PEWCore_NonVolatileProgramMemory_FlushInterval
                     if (NonVolatileFlushLast <= NonVolatileFlushInterval)

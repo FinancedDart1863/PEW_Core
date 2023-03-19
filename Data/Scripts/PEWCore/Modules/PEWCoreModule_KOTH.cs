@@ -11,7 +11,7 @@ namespace PEWCore.Modules
 {
     public class PEWCoreModule_KOTH
     {
-        public static MyTuple<int, PEWCoreNonVolatileMemory> execute(VRage.ModAPI.IMyEntity entity, string[] instructionSet, PEWCoreNonVolatileMemory nonVolatileMemory)
+        public static MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>> execute(VRage.ModAPI.IMyEntity entity, string[] instructionSet, PEWCoreVolatileMemory volatileMemory,PEWCoreNonVolatileMemory nonVolatileMemory)
         {
             //We need to be careful in program code sections as failures, either with memory accesses or the logic itself, can crash the server. Everything needs to be in a try block.
 
@@ -24,13 +24,11 @@ namespace PEWCore.Modules
 
                 //KOTH instruction set is only two lines.
                 //Use config for KOTH information
-
-
-                return new MyTuple<int, PEWCoreNonVolatileMemory>(1, nonVolatileMemory);
+                return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(1, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
             catch (Exception ex)
             {
-                return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
         }
     }

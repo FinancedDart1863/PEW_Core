@@ -29,7 +29,7 @@ namespace PEWCore.Programs
 {
     public class PEWCoreProgram_BasicTimedDispenser
     {
-        public static MyTuple<int, PEWCoreNonVolatileMemory> execute(VRage.ModAPI.IMyEntity entity, string[] instructionSet, PEWCoreNonVolatileMemory nonVolatileMemory)
+        public static MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>> execute(VRage.ModAPI.IMyEntity entity, string[] instructionSet, PEWCoreVolatileMemory volatileMemory ,PEWCoreNonVolatileMemory nonVolatileMemory)
         {
             //We need to be careful in program code sections as failures, either with memory accesses or the logic itself, can crash the server. Everything needs to be in a try block.
             if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[Program | BasicTimedDispenser] Execution", VRageMath.Color.White); }
@@ -48,27 +48,27 @@ namespace PEWCore.Programs
             try
             {
                 string programName = instructionSet[0];
-                try { ISspecifiedExecInterval = Int32.Parse(instructionSet[1]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
+                try { ISspecifiedExecInterval = Int32.Parse(instructionSet[1]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory,nonVolatileMemory));}
                 string programDirective = instructionSet[2];
                 string containerReferenceName = instructionSet[3];
                 string dispenseItem1Type = instructionSet[4];
                 string dispenseItem1 = instructionSet[5];
 
-                try { dispenseItem1IntervalAmount = Int32.Parse(instructionSet[6]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
-                try { dispenseItem1MaxAtOnceAmount = Int32.Parse(instructionSet[7]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
-                try { dispenseItem1Interval = Int32.Parse(instructionSet[8]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
+                try { dispenseItem1IntervalAmount = Int32.Parse(instructionSet[6]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                try { dispenseItem1MaxAtOnceAmount = Int32.Parse(instructionSet[7]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                try { dispenseItem1Interval = Int32.Parse(instructionSet[8]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
 
                 string dispenseItem2Type = instructionSet[9];
                 string dispenseItem2 = instructionSet[10];
-                try { dispenseItem2IntervalAmount = Int32.Parse(instructionSet[11]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
-                try { dispenseItem2MaxAtOnceAmount = Int32.Parse(instructionSet[12]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
-                try { dispenseItem2Interval = Int32.Parse(instructionSet[13]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
+                try { dispenseItem2IntervalAmount = Int32.Parse(instructionSet[11]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                try { dispenseItem2MaxAtOnceAmount = Int32.Parse(instructionSet[12]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                try { dispenseItem2Interval = Int32.Parse(instructionSet[13]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
 
                 string dispenseItem3Type = instructionSet[14];
                 string dispenseItem3 = instructionSet[15];
-                try { dispenseItem3IntervalAmount = Int32.Parse(instructionSet[16]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
-                try { dispenseItem3MaxAtOnceAmount = Int32.Parse(instructionSet[17]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
-                try { dispenseItem3Interval = Int32.Parse(instructionSet[18]); } catch (FormatException) { return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory); }
+                try { dispenseItem3IntervalAmount = Int32.Parse(instructionSet[16]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                try { dispenseItem3MaxAtOnceAmount = Int32.Parse(instructionSet[17]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                try { dispenseItem3Interval = Int32.Parse(instructionSet[18]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
 
                 //Configure required program PEWCore memory abstracts
                 string[] thisProgramMemoryStrings = new string[1] { "" };
@@ -77,14 +77,14 @@ namespace PEWCore.Programs
 
                 //Load program PEWCore memory
                 MyCubeBlock thisLogicalCore = entity as MyCubeBlock;
-                MyTuple<int, MyTuple<string[], bool[], int[]>> thisProgramMemorySegment = PEWCoreNonVolatileMemory.GetMemorySegment(thisLogicalCore.Name, nonVolatileMemory.NonVolatileMemoryNonShared);
-                if (thisProgramMemorySegment.Item1 == 0)
+                MyTuple<int, MyTuple<string[], bool[], int[]>> thisProgramNonVolatileMemorySegment = PEWCoreNonVolatileMemory.GetMemorySegment(thisLogicalCore.Name, nonVolatileMemory.NonVolatileMemoryNonShared);
+                if (thisProgramNonVolatileMemorySegment.Item1 == 0)
                 { PEWCoreNonVolatileMemory.SetMemorySegment(thisLogicalCore.Name, nonVolatileMemory.NonVolatileMemoryNonShared, thisProgramMemoryStrings, thisProgramMemoryBools, thisProgramMemoryInts); }
                 else
                 {
-                    thisProgramMemoryStrings = thisProgramMemorySegment.Item2.Item1;
-                    thisProgramMemoryBools = thisProgramMemorySegment.Item2.Item2;
-                    thisProgramMemoryInts = thisProgramMemorySegment.Item2.Item3;
+                    thisProgramMemoryStrings = thisProgramNonVolatileMemorySegment.Item2.Item1;
+                    thisProgramMemoryBools = thisProgramNonVolatileMemorySegment.Item2.Item2;
+                    thisProgramMemoryInts = thisProgramNonVolatileMemorySegment.Item2.Item3;
                 }
                 //Program PEWCore memory
                 int timeSinceLastFullCompletion = thisProgramMemoryInts[0];
@@ -136,7 +136,7 @@ namespace PEWCore.Programs
                                                             BTDispenserAddIngot(programDirective, inventory, new MyItemType("MyObjectBuilder_Ingot", dispenseItem1), dispenseItem1, dispenseItem1IntervalAmount, dispenseItem1MaxAtOnceAmount);
                                                             break;
                                                         default:
-                                                            return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                                                            return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
                                                             break;
                                                     }
                                                     item1Intervaled = true;
@@ -171,7 +171,7 @@ namespace PEWCore.Programs
                                                             BTDispenserAddIngot(programDirective, inventory, new MyItemType("MyObjectBuilder_Ingot", dispenseItem2), dispenseItem2, dispenseItem2IntervalAmount, dispenseItem2MaxAtOnceAmount);
                                                             break;
                                                         default:
-                                                            return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                                                            return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
                                                             break;
                                                     }
                                                     item2Intervaled = true;
@@ -206,7 +206,7 @@ namespace PEWCore.Programs
                                                             BTDispenserAddIngot(programDirective, inventory, new MyItemType("MyObjectBuilder_Ingot", dispenseItem3), dispenseItem3, dispenseItem3IntervalAmount, dispenseItem3MaxAtOnceAmount);
                                                             break;
                                                         default:
-                                                            return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                                                            return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
                                                             break;
                                                     }
                                                     item3Intervaled = true;
@@ -218,7 +218,7 @@ namespace PEWCore.Programs
                             }
                         }
                     } catch (Exception ex) {
-                        return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                        return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
                     }
 
                     if (item1Intervaled && item2Intervaled & item3Intervaled)
@@ -237,11 +237,11 @@ namespace PEWCore.Programs
 
                     PEWCoreNonVolatileMemory.SetMemorySegment(thisLogicalCore.Name, nonVolatileMemory.NonVolatileMemoryNonShared, thisProgramMemoryStrings, thisProgramMemoryBools, thisProgramMemoryInts);
                 }
-                return new MyTuple<int, PEWCoreNonVolatileMemory>(ISspecifiedExecInterval, nonVolatileMemory);
+                return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(ISspecifiedExecInterval, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
             catch (Exception ex)
             {
-                return new MyTuple<int, PEWCoreNonVolatileMemory>(0, nonVolatileMemory);
+                return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
         }
 
