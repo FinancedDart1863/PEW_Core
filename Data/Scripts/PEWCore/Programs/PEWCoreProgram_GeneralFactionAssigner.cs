@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -22,37 +21,14 @@ using VRage.Game.Entities;
 using VRage.Game.Components;
 using VRage.Game;
 using VRage.Game.ModAPI;
-using SpaceEngineers.Game.ModAPI;
-using System.Security.Cryptography.X509Certificates;
 
 namespace PEWCore.Programs
 {
-    public class PEWCoreProgram_GeneralFactionAssignerDelayedFaction
-    {
-        public IMyFaction faction;
-        public int runtime;
-
-        public PEWCoreProgram_GeneralFactionAssignerDelayedFaction(IMyFaction faction, int runtime)
-        {
-            this.faction = faction;
-            this.runtime = runtime;
-        }
-    }
-
     internal class PEWCoreProgram_GeneralFactionAssigner
     {
-        public List<IMyPlayer> allPlayers = new List<IMyPlayer>();
-        public string factionButtonSubtype = "FactionButton";
-        public List<string> reuseSections = new List<string>();
-        public List<PEWCoreProgram_GeneralFactionAssignerDelayedFaction> delayedFactions = new List<PEWCoreProgram_GeneralFactionAssignerDelayedFaction>();
-        public List<string> specialFactions = new List<string>()
-        {
-            "SPRT",
-            "SPID"
-        };
-
         public static MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>> execute(VRage.ModAPI.IMyEntity entity, string[] instructionSet, PEWCoreVolatileMemory volatileMemory,PEWCoreNonVolatileMemory nonVolatileMemory)
         {
+
             //We need to be careful in program code sections as failures, either with memory accesses or the logic itself, can crash the server. Everything needs to be in a try block.
             if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[Program | GeneralFactionAssigner] Execution", VRageMath.Color.White); }
 
@@ -70,8 +46,25 @@ namespace PEWCore.Programs
                 string faction3Tag = instructionSet[7];
                 string faction3ZoneAssignName = instructionSet[8];
 
-                //Load program PEWCore memory
                 MyCubeBlock thisLogicalCore = entity as MyCubeBlock;
+
+                //Configure memory abstracts
+                string[] thisProgramMemoryStrings = new string[0] {};
+                bool[] thisProgramMemoryBools = new bool[0] {};
+                int[] thisProgramMemoryInts = new int[0] {};
+
+                //Load program PEWCore memory. Add event trigger functions.
+                MyTuple<int, MyTuple<string[], bool[], int[]>> thisProgramNonSharedVolatileMemorySegment = PEWCoreNonVolatileMemory.GetMemorySegment("GeneralFactionAssigner", nonVolatileMemory.NonVolatileMemoryShared);
+                if (thisProgramNonSharedVolatileMemorySegment.Item1 == 0)
+                {
+                    PEWCoreNonVolatileMemory.SetMemorySegment("GeneralFactionAssigner", nonVolatileMemory.NonVolatileMemoryShared, thisProgramMemoryStrings, thisProgramMemoryBools, thisProgramMemoryInts);
+                }
+                else
+                {
+                    thisProgramMemoryStrings = thisProgramNonSharedVolatileMemorySegment.Item2.Item1;
+                    thisProgramMemoryBools = thisProgramNonSharedVolatileMemorySegment.Item2.Item2;
+                    thisProgramMemoryInts = thisProgramNonSharedVolatileMemorySegment.Item2.Item3;
+                }
 
                 VRage.ModAPI.IMyEntity parent = entity.GetTopMostParent(); //Topmost parent of logical core is the grid on which it is installed.
                 MyCubeGrid grid = parent as MyCubeGrid; //Convert grid entity to grid
@@ -84,7 +77,7 @@ namespace PEWCore.Programs
                         {
                             Vector3D position = currentLogicalZone.GetPosition();
                             BoundingSphereD sphere = new BoundingSphereD(position, logicalZoneRadius);
-                            List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+                            System.Collections.Generic.List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
                             foreach (IMyEntity foundEntity in entities)
                             {
                                 // Projection or invalid object
@@ -113,13 +106,17 @@ namespace PEWCore.Programs
                                         {
                                            if ((Faction2 != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId)) && (Faction3 != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId)))
                                            {
-                                                MyAPIGateway.Session.Factions.AddPlayerToFaction(foundPlayer.ControllerInfo.ControllingIdentityId, Faction1.FactionId);
+                                                MyVisualScriptLogicProvider.KickPlayerFromFaction(foundPlayer.ControllerInfo.ControllingIdentityId);
+
+                                                //Add them to new faction
+                                                MyAPIGateway.Session.Factions.SendJoinRequest(Faction1.FactionId, foundPlayer.ControllerInfo.ControllingIdentityId);
+                                                MyAPIGateway.Session.Factions.AcceptJoin(Faction1.FactionId, foundPlayer.ControllerInfo.ControllingIdentityId);
                                                 //if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[Program | GeneralFactionAssigner] Player added to faction!", VRageMath.Color.White); }
-                                           }
+                                            }
                                            else
                                            {
                                                 //if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[Program | GeneralFactionAssigner] Player already in another faction!", VRageMath.Color.White); }
-                                            }
+                                           }
                                         }
                                         else
                                         {
@@ -134,7 +131,7 @@ namespace PEWCore.Programs
                         {
                             Vector3D position = currentLogicalZone.GetPosition();
                             BoundingSphereD sphere = new BoundingSphereD(position, logicalZoneRadius);
-                            List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+                            System.Collections.Generic.List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
                             foreach (IMyEntity foundEntity in entities)
                             {
                                 // Projection or invalid object
@@ -163,7 +160,11 @@ namespace PEWCore.Programs
                                         {
                                             if ((Faction1 != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId)) && (Faction3 != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId)))
                                             {
-                                                MyAPIGateway.Session.Factions.AddPlayerToFaction(foundPlayer.ControllerInfo.ControllingIdentityId, Faction2.FactionId);
+                                                MyVisualScriptLogicProvider.KickPlayerFromFaction(foundPlayer.ControllerInfo.ControllingIdentityId);
+
+                                                //Add them to new faction
+                                                MyAPIGateway.Session.Factions.SendJoinRequest(Faction2.FactionId, foundPlayer.ControllerInfo.ControllingIdentityId);
+                                                MyAPIGateway.Session.Factions.AcceptJoin(Faction2.FactionId, foundPlayer.ControllerInfo.ControllingIdentityId);
                                                 //if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[Program | GeneralFactionAssigner] Player added to faction!", VRageMath.Color.White); }
                                             }
                                             else
@@ -184,7 +185,7 @@ namespace PEWCore.Programs
                         {
                             Vector3D position = currentLogicalZone.GetPosition();
                             BoundingSphereD sphere = new BoundingSphereD(position, logicalZoneRadius);
-                            List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+                            System.Collections.Generic.List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
                             foreach (IMyEntity foundEntity in entities)
                             {
                                 // Projection or invalid object
@@ -213,7 +214,11 @@ namespace PEWCore.Programs
                                         {
                                             if ((Faction1 != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId)) && (Faction2 != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId)))
                                             {
-                                                MyAPIGateway.Session.Factions.AddPlayerToFaction(foundPlayer.ControllerInfo.ControllingIdentityId, Faction3.FactionId);
+                                                MyVisualScriptLogicProvider.KickPlayerFromFaction(foundPlayer.ControllerInfo.ControllingIdentityId);
+
+                                                //Add them to new faction
+                                                MyAPIGateway.Session.Factions.SendJoinRequest(Faction3.FactionId, foundPlayer.ControllerInfo.ControllingIdentityId);
+                                                MyAPIGateway.Session.Factions.AcceptJoin(Faction3.FactionId, foundPlayer.ControllerInfo.ControllingIdentityId);
                                                 //if (PEWCoreMain.ConfigData.PEWGeneralConfig.DeveloperMode) { Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[Program | GeneralFactionAssigner] Player added to faction!", VRageMath.Color.White); }
                                             }
                                             else
@@ -232,11 +237,84 @@ namespace PEWCore.Programs
                         }
                     }
                 }
+
+                System.Collections.Generic.List<IMyPlayer> connectedPlayers = new System.Collections.Generic.List<IMyPlayer>();
+                System.Collections.Generic.List<ulong> connectedPlayersSteamID = new System.Collections.Generic.List<ulong>();
+                MyAPIGateway.Players.GetPlayers(connectedPlayers); //Populate the IMyPlayer List
+                connectedPlayersSteamID = new System.Collections.Generic.List<ulong>(); //Clear the connected player steamID list
+
+                for (int x = 0; x < connectedPlayers.Count; x++)
+                {
+                    connectedPlayersSteamID.Add(connectedPlayers[x].SteamUserId);
+                }
+
+                for (int x = 0; x < connectedPlayers.Count; x++)
+                {
+                    /*
+                    if (connectedPlayers[x].PromoteLevel == MyPromoteLevel.Admin || connectedPlayers[x].PromoteLevel == MyPromoteLevel.Owner)
+                    {
+                        MyAPIGateway.Utilities.ShowMessage("DBG", "here1");
+                    }
+                    else
+                    {
+                    */
+                    
+                    IMyFaction currentPlayerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(connectedPlayers[x].PlayerID);
+                    string currentPlayerFactionTag = "";
+                    if (currentPlayerFaction != null)
+                    {
+                        currentPlayerFactionTag = currentPlayerFaction.Tag;
+                    }
+                    if (!(thisProgramMemoryStrings.Contains(connectedPlayersSteamID[x].ToString())))
+                    {
+                        //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerNotRegistered");
+                        if (currentPlayerFactionTag == "") {
+                            //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerNotInFaction");
+                        }
+                        else
+                        {
+                            //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerInFaction");
+                            if (currentPlayerFactionTag == "SPRT" || currentPlayerFactionTag == "SPID")
+                            {
+                                MyVisualScriptLogicProvider.KickPlayerFromFaction(connectedPlayers[x].PlayerID);
+                            }
+                            else
+                            {
+                                int temp = thisProgramMemoryStrings.Length;
+                                Array.Resize(ref thisProgramMemoryStrings, thisProgramMemoryStrings.Length + 2);
+                                thisProgramMemoryStrings[temp] = connectedPlayersSteamID[x].ToString();
+                                thisProgramMemoryStrings[temp + 1] = currentPlayerFactionTag;
+                            }
+                        }
+                    } 
+                    else
+                    {
+                        //MyAPIGateway.Utilities.ShowMessage("DBG", "PlayerRegistered");
+                        int playerRegistryIndex = Array.IndexOf(thisProgramMemoryStrings, connectedPlayersSteamID[x].ToString());
+                        string playerRegisteredFactionTag = thisProgramMemoryStrings[(playerRegistryIndex + 1)];
+                        if (currentPlayerFactionTag != playerRegisteredFactionTag)
+                        {
+                            //MyAPIGateway.Utilities.ShowMessage("DBG", "Lock player to faction");
+                            if (playerRegisteredFactionTag != "")
+                            {
+                                MyVisualScriptLogicProvider.KickPlayerFromFaction(connectedPlayers[x].PlayerID);
+                            }
+                            MyAPIGateway.Session.Factions.SendJoinRequest(MyAPIGateway.Session.Factions.TryGetFactionByTag(playerRegisteredFactionTag).FactionId, connectedPlayers[x].PlayerID);
+                            MyAPIGateway.Session.Factions.AcceptJoin(MyAPIGateway.Session.Factions.TryGetFactionByTag(playerRegisteredFactionTag).FactionId, connectedPlayers[x].PlayerID);
+                        }
+                    //}
+                    }
+                }
+
+                //We need to write the program memory segment at the end of the core program logic
+
+                PEWCoreNonVolatileMemory.SetMemorySegment("GeneralFactionAssigner", nonVolatileMemory.NonVolatileMemoryShared, thisProgramMemoryStrings, thisProgramMemoryBools, thisProgramMemoryInts);
+
                 return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(ISspecifiedExecInterval, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
             catch (Exception ex)
             {
-                MyAPIGateway.Utilities.ShowMessage("GeneralFactionAssigner]", "Execute failure");
+                MyAPIGateway.Utilities.ShowMessage("[GeneralFactionAssigner]", "Execute failure");
                 return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
         }
