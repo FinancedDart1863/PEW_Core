@@ -253,6 +253,7 @@ namespace PEWCore.Programs
                     if (connectedPlayers[x].PromoteLevel == MyPromoteLevel.Admin || connectedPlayers[x].PromoteLevel == MyPromoteLevel.Owner)
                     {
                         //MyAPIGateway.Utilities.ShowMessage("DBG", "here1");
+                        
                     }
                     else
                     {
@@ -281,6 +282,7 @@ namespace PEWCore.Programs
                                     Array.Resize(ref thisProgramMemoryStrings, thisProgramMemoryStrings.Length + 2);
                                     thisProgramMemoryStrings[temp] = connectedPlayersSteamID[x].ToString();
                                     thisProgramMemoryStrings[temp + 1] = currentPlayerFactionTag;
+                                    MyVisualScriptLogicProvider.SendChatMessageColored("A player has joined " + currentPlayerFactionTag + "!", VRageMath.Color.White);
                                 }
                             }
                         } 
