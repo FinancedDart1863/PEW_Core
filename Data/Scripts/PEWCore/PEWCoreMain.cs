@@ -78,7 +78,7 @@ namespace PEWCore
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | Initialize] Execute server code");
                 MyAPIGateway.Utilities.ShowMessage("PEWCore", "[Server start] © 2023 Phobos Engineered Weaponry Group");
-                //PEWNetworkGPSManager.initialization();
+                PEWNetworkGPSManager.initialization();
                 InitMemory(); //Start memory management
             }
 
@@ -234,6 +234,8 @@ namespace PEWCore
                 {
                     MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory> memoryReturn = new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(PEWCoreVolatileMemory, PEWCoreNonVolatileMemory);
                     memoryReturn = PEWCoreLogicalCoreProcess.Process(PEWCoreVolatileMemory, PEWCoreNonVolatileMemory);
+                    PEWNetworkGPSManager.PEWNetworkGPSManagerMain();
+
                     PEWCoreVolatileMemory = memoryReturn.Item1;
                     PEWCoreNonVolatileMemory = memoryReturn.Item2;
 

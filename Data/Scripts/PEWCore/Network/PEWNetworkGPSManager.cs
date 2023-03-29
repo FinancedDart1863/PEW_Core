@@ -25,6 +25,7 @@ using VRage.Library.Collections;
 using System.Runtime.CompilerServices;
 using VRage.ObjectBuilder;
 using System.Linq;
+using System.Reflection;
 
 namespace PEWCore.Network
 {
@@ -33,18 +34,16 @@ namespace PEWCore.Network
 
         List<IMyPlayer> connectedPlayers = new List<IMyPlayer>();
         List<IMyIdentity> allHistoryPlayersIdentities = new List<IMyIdentity>();
-        List<ulong> connectedPlayersSteamID = new List<ulong>();
-        string[] reservedGPSExpressions = new string[] { "KOTH_", "SYSTEM_", "Story_", "HVT_", "Hint_" };
+        List<string> connectedPlayersSteamID = new List<string>();
+        string[] reservedGPSExpressions = new string[] { "KOTH_", "System_", "Story_", "HVT_", "Hint_", "Mission_" };
 
         /// <summary>
         /// Official system GPS table for GPS markers to be managed across the network to clients.
-        /// /Key is unique name for GPS (i.e. KothKill1, KothHill2, HVT1, HVT2, etc) managed by the respective subsystems
+        /// Key is unique name for GPS (i.e. KothKill1, KothHill2, HVT1, HVT2, etc) managed by the respective subsystems
+        /// Tuple is old hash and latest IMyGPS
         /// </summary>
-        public static Dictionary<string, MyTuple<int, IMyGps>> systemGPSTable = new Dictionary<string, MyTuple<int, IMyGps>>();
-
-        //Networked GPS matrix for managing marker synchronization across the network
-        Dictionary<int, Dictionary<ulong, IMyGps>> synchronizedNetworkedGPSTable = new Dictionary<int, Dictionary<ulong, IMyGps>>();
-
+        ///
+        public static List<MyTuple<string, int, IMyGps>> systemGPSTable = new List<MyTuple<string, int, IMyGps>>();
 
         public void initialization()
         {
@@ -56,34 +55,31 @@ namespace PEWCore.Network
                 ClientCleanAllSystemGPS(allHistoryPlayersIdentities[i].PlayerId);
             }
         }
-        
+
 
         //This runs on an interval
         public void PEWNetworkGPSManagerMain()
         {
             connectedPlayers = new List<IMyPlayer>(); //Clear the connected player IMyPlayer list
             MyAPIGateway.Players.GetPlayers(connectedPlayers); //Populated the IMyPlayer List
-            connectedPlayersSteamID = new List<ulong>(); //Clear the connected player steamID list
+            connectedPlayersSteamID = new List<string>(); //Clear the connected player steamID list
 
             try
             {
                 for (int x = 0; x < connectedPlayers.Count; x++)
                 {
-                    connectedPlayersSteamID.Add(connectedPlayers[x].SteamUserId);
+                    connectedPlayersSteamID.Add(connectedPlayers[x].SteamUserId.ToString());
                 }
 
                 //Iterate through each player
                 for (int x = 0; x < connectedPlayersSteamID.Count; x++)
                 {
-                    //Iterate through each up-to-date system waypoint
-                    for (int z = 0; z < systemGPSTable.Count; z++)
-                    {
-                        //systemGPSTable[z].Item1
-                    }
+                    ClientSyncSystemGPS(connectedPlayers[x].IdentityId);
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                PEWCoreLogging.Instance.WriteLine("[PEWCore | PEWNetworkGPSManager] Cycle failure");
+                //PEWCoreLogging.Instance.WriteLine("[PEWCore | PEWNetworkGPSManager] Cycle failure");
             }
         }
 
@@ -100,17 +96,109 @@ namespace PEWCore.Network
             }
         }
 
-        public void ClientCleanAllOutdatedSystemGPS(long clientIdentityId)
+        public void ClientSyncSystemGPS(long clientIdentityId)
         {
             List<IMyGps> tempGpsList = new List<IMyGps>();
             tempGpsList = MyAPIGateway.Session.GPS.GetGpsList(clientIdentityId);
+            List<int> tempGpsListHashes = new List<int>();
+
+            for (int i = 0; i < tempGpsList.Count; i++)
+            {
+                tempGpsListHashes.Add(tempGpsList[i].Hash);
+            }
+
+            //Iterate through a players GPS markers. For regexed markers, update them if they're outdated. Leave them alone if they're updated. Delete them if neither.
             for (int x = 0; x < tempGpsList.Count; x++)
             {
-                if (reservedGPSExpressions.Any(tempGpsList[x].Name.Contains)) //We clear all GPS markers from clients GPS list that contain the reserved expressions
+                if (reservedGPSExpressions.Any(tempGpsList[x].Name.Contains))
                 {
-                    MyAPIGateway.Session.GPS.RemoveGps(clientIdentityId, tempGpsList[x]);
+                    bool recentOrCurrentGPS = false;
+                    for (int z = 0; z < systemGPSTable.Count; z++)
+                    {
+                        if (tempGpsListHashes[x] == systemGPSTable[z].Item2) //GPS marker is outdated (it has the old hash of a system GPS). Update it
+                        {
+                            recentOrCurrentGPS = true;
+                            IMyGps tempGPS = MyAPIGateway.Session.GPS.Create(tempGpsList[x].Name, tempGpsList[x].Description, tempGpsList[x].Coords, tempGpsList[x].ShowOnHud);
+                            tempGPS.UpdateHash();
+                            tempGPS.Coords = systemGPSTable[z].Item3.Coords;
+                            tempGPS.Name = systemGPSTable[z].Item3.Name;
+                            tempGPS.Description = systemGPSTable[z].Item3.Description;
+                            tempGPS.GPSColor = systemGPSTable[z].Item3.GPSColor;
+                            tempGPS.ShowOnHud = systemGPSTable[z].Item3.ShowOnHud;
+                            MyAPIGateway.Session.GPS.ModifyGps(clientIdentityId, tempGPS);
+                         }
+                        else
+                        {
+                            if (tempGpsListHashes[x] == systemGPSTable[z].Item3.Hash) //GPS marker is up to date
+                            {
+                                recentOrCurrentGPS = true;
+                            }
+                        }
+                    }
+                    if (!recentOrCurrentGPS) //This "system" GPS isn't an outdated or current GPS marker. Delete it
+                    {
+                        MyAPIGateway.Session.GPS.RemoveGps(clientIdentityId, tempGpsList[x]);
+                    }
                 }
             }
+
+            //Iterate through the system GPS markers. Add any markers to player if they don't have them
+            for (int u = 0; u < systemGPSTable.Count; u++)
+            {
+                bool playerHasGPSMarker = false;
+                for (int x = 0; x < tempGpsList.Count; x++)
+                {
+                    if (tempGpsListHashes[x] == systemGPSTable[u].Item3.Hash)
+                    {
+                        playerHasGPSMarker = true;
+                    }
+                }
+                if (!playerHasGPSMarker)
+                {
+                    MyAPIGateway.Session.GPS.AddGps(clientIdentityId, systemGPSTable[u].Item3);
+                }
+            }
+        }
+
+        //Add or update an existing system GPS marker
+        public void GPSManagerAddOrUpdateSystemGPS(string systemGPSName, IMyGps gpsMarker)
+        {
+            bool newSystemGPSMarker = true;
+            for (int u = 0; u < systemGPSTable.Count; u++)
+            {
+                if (systemGPSTable[u].Item1 == systemGPSName)
+                {
+                    newSystemGPSMarker = false;
+                    systemGPSTable[u] = new MyTuple<string, int, IMyGps>(systemGPSTable[u].Item1, systemGPSTable[u].Item3.Hash, gpsMarker);
+                }
+            }
+            if (newSystemGPSMarker)
+            {
+                systemGPSTable.Add(new MyTuple<string, int, IMyGps>(systemGPSName, gpsMarker.Hash, gpsMarker));
+            }
+        }
+        public void GPSManagerRemoveSystemGPS(string systemGPSName)
+        {
+            for (int u = 0; u < systemGPSTable.Count; u++)
+            {
+                if (systemGPSTable[u].Item1 == systemGPSName)
+                {
+                    systemGPSTable.RemoveAt(u);
+                }
+            }
+        }
+
+        public bool GPSManagerHasSystemGPS(string systemGPSName)
+        {
+            bool hasSystemGPS = false;
+            for (int u = 0; u < systemGPSTable.Count; u++)
+            {
+                if (systemGPSTable[u].Item1 == systemGPSName)
+                {
+                    hasSystemGPS= true;
+                }
+            }
+            return hasSystemGPS;
         }
     }
 }
