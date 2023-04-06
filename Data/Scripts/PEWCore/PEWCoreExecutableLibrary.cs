@@ -35,6 +35,8 @@ namespace PEWCore
                 case "PEWCoreKOTH":
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | PEWCoreKOTHExecute]", "PEWCoreKOTH");
                     return PEWCoreModule_KOTH.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
+                case "PEWCoreSSZ":
+                    return PEWCoreModule_SSZ.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
                 default:
                     return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
