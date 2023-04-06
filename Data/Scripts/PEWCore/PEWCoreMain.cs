@@ -57,7 +57,8 @@ namespace PEWCore
 
         //Allocate channel 42747 for PEWCore network communications system
         public PEWNetworkMain PEWNetworkHandle = new PEWNetworkMain(42747);
-        public static PEWNetworkGPSManager PEWNetworkGPSManagerHandle = new PEWNetworkGPSManager();
+        public PEWNetworkGPSManager PEWNetworkGPSManager = new PEWNetworkGPSManager();
+
         private void Initialize()
         {
             CoreInitialized = true;
@@ -77,7 +78,7 @@ namespace PEWCore
             {
                 PEWCoreLogging.Instance.WriteLine("[PEWCore | Initialize] Execute server code");
                 MyAPIGateway.Utilities.ShowMessage("PEWCore", "[Server start] © 2023 Phobos Engineered Weaponry Group");
-                PEWNetworkGPSManagerHandle.initialization();
+                PEWNetworkGPSManager.initialization();
                 InitMemory(); //Start memory management
             }
 
@@ -233,7 +234,7 @@ namespace PEWCore
                 {
                     MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory> memoryReturn = new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(PEWCoreVolatileMemory, PEWCoreNonVolatileMemory);
                     memoryReturn = PEWCoreLogicalCoreProcess.Process(PEWCoreVolatileMemory, PEWCoreNonVolatileMemory);
-                    PEWNetworkGPSManagerHandle.PEWNetworkGPSManagerMain();
+                    PEWNetworkGPSManager.PEWNetworkGPSManagerMain();
 
                     PEWCoreVolatileMemory = memoryReturn.Item1;
                     PEWCoreNonVolatileMemory = memoryReturn.Item2;
