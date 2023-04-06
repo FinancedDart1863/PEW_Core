@@ -13,6 +13,8 @@ namespace PEWCore
         public PEWHVTConfig PEWHVTConfig = new PEWHVTConfig();
         [ProtoMember(3)]
         public PEWKOTHConfig PEWKOTHConfig = new PEWKOTHConfig();
+        [ProtoMember(4)]
+        public PEWSSZConfig PEWSSZConfig = new PEWSSZConfig();
     }
 
     [ProtoContract(UseProtoMembersOnly = true)]
@@ -199,5 +201,22 @@ namespace PEWCore
         public int PEWKOTH_Hill3AwardItem3Interval = 300; //Delay in seconds between dispensing of this award item 3 into the controlling factions container
         [ProtoMember(72)]
         public int PEWKOTH_Hill3AwardItem3Amount = 1; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
+    }
+
+    [ProtoContract(UseProtoMembersOnly = true)]
+    public class PEWSSZConfig
+    {
+        [ProtoMember(1)]
+        public float PEWSSZ_Radius = 30f; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
+        [ProtoMember(2)]
+        public bool PEWSSZ_AllowEnemyCharacters = false; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
+        [ProtoMember(3)]
+        public bool PEWSSZ_AllowEnemyRemoteControlBlocks = false; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
+        [ProtoMember(4)]
+        public int PEWSSZ_HVTActionInterval = 1200;
+        [ProtoMember(5)]
+        public float PEWSSZ_ShrinkDistance = 5000f;
+        [ProtoMember(6)]
+        public float PEWSSZ_RegenerateDistance = 1000f;
     }
 }
