@@ -200,5 +200,10 @@ namespace PEWCore.Network
             }
             return hasSystemGPS;
         }
+
+        public List<MyTuple<string, int, IMyGps>> GPSManagerSystemGPSTable()
+        {
+            return systemGPSTable;
+        }
     }
 }
