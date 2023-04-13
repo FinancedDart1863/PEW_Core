@@ -26,6 +26,7 @@ using System.Runtime.CompilerServices;
 using VRage.ObjectBuilder;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PEWCore.Network
 {
@@ -36,6 +37,7 @@ namespace PEWCore.Network
         List<IMyIdentity> allHistoryPlayersIdentities = new List<IMyIdentity>();
         List<string> connectedPlayersSteamID = new List<string>();
         string[] reservedGPSExpressions = new string[] { "KOTH_", "System_", "Story_", "HVT_", "Hint_", "Mission_" };
+        string reservedHVTExpression = "HVT_";
 
         /// <summary>
         /// Official system GPS table for GPS markers to be managed across the network to clients.
@@ -54,6 +56,8 @@ namespace PEWCore.Network
             {
                 ClientCleanAllSystemGPS(allHistoryPlayersIdentities[i].PlayerId);
             }
+
+            //MyAPIGateway.Utilities.ShowMessage("DBG", "GPSManager init");
         }
 
 
@@ -63,7 +67,7 @@ namespace PEWCore.Network
             connectedPlayers = new List<IMyPlayer>(); //Clear the connected player IMyPlayer list
             MyAPIGateway.Players.GetPlayers(connectedPlayers); //Populated the IMyPlayer List
             connectedPlayersSteamID = new List<string>(); //Clear the connected player steamID list
-
+            //MyAPIGateway.Utilities.ShowMessage("DBG", "GPSManager. Connected players: " + connectedPlayers.Count.ToString());
             try
             {
                 for (int x = 0; x < connectedPlayers.Count; x++)
@@ -96,6 +100,60 @@ namespace PEWCore.Network
             }
         }
 
+        public void ClientCleanHVTSystemGPS(long clientIdentityId)  //Clear HVT markers
+        {
+            List<IMyGps> tempGpsList = new List<IMyGps>();
+            tempGpsList = MyAPIGateway.Session.GPS.GetGpsList(clientIdentityId);
+            for (int x = 0; x < tempGpsList.Count; x++)
+            {
+                if (Regex.IsMatch(tempGpsList[x].Name, reservedHVTExpression))
+                {
+                    MyAPIGateway.Session.GPS.RemoveGps(clientIdentityId, tempGpsList[x]);
+                    //MyAPIGateway.Utilities.ShowMessage("DBG", "Client clean HVT GPS");
+                }
+            }
+        }
+
+        public void GPSManagerCleanHVTSystemGPS()
+        {
+            for (int x = 0; x < systemGPSTable.Count; x++)
+            {
+                if (Regex.IsMatch(systemGPSTable[x].Item3.Name, "HVT_"))
+                {
+                    systemGPSTable.Remove(systemGPSTable[x]);
+                    //MyAPIGateway.Utilities.ShowMessage("DBG", "System clean HVT GPS");
+                }
+            }
+        }
+        
+        public void GPSManagerCleanSystemGPSByRegex(string regexExp1, string regexExp2)
+        {
+            if (regexExp2 != null)
+            {
+                for (int x = 0; x < systemGPSTable.Count; x++)
+                {
+                    if (Regex.IsMatch(systemGPSTable[x].Item3.Name, regexExp1) && Regex.IsMatch(systemGPSTable[x].Item3.Name, regexExp2))
+                    {
+                        systemGPSTable.Remove(systemGPSTable[x]);
+                        //MyAPIGateway.Utilities.ShowMessage("DBG", "System clean HVT GPS");
+                    }
+                }
+            }
+            else
+            {
+                if (regexExp1 != null)
+                {
+                    for (int x = 0; x < systemGPSTable.Count; x++)
+                    {
+                        if (Regex.IsMatch(systemGPSTable[x].Item3.Name, regexExp1))
+                        {
+                            systemGPSTable.Remove(systemGPSTable[x]);
+                            //MyAPIGateway.Utilities.ShowMessage("DBG", "System clean HVT GPS");
+                        }
+                    }
+                }
+            }
+        }
         public void ClientSyncSystemGPS(long clientIdentityId)
         {
             List<IMyGps> tempGpsList = new List<IMyGps>();
@@ -177,6 +235,14 @@ namespace PEWCore.Network
                 systemGPSTable.Add(new MyTuple<string, int, IMyGps>(systemGPSName, gpsMarker.Hash, gpsMarker));
             }
         }
+
+        //Add or update an existing system GPS marker
+        public void GPSManagerAddSystemGPS(string systemGPSName, IMyGps gpsMarker)
+        {
+                systemGPSTable.Add(new MyTuple<string, int, IMyGps>(systemGPSName, gpsMarker.Hash, gpsMarker));
+        }
+
+
         public void GPSManagerRemoveSystemGPS(string systemGPSName)
         {
             for (int u = 0; u < systemGPSTable.Count; u++)
