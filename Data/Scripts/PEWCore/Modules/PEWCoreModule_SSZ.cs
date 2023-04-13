@@ -1,4 +1,6 @@
-﻿using System;
+﻿//© 2023 FinancedDart
+//© 2023 Phobos Engineered Weaponry Group
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,13 +39,14 @@ namespace PEWCore.Modules
             int timeUntilLastExecution = 0; //Time until last execution in seconds
             int currentSafezoneradius = (int)PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_Radius;
             string safeZoneFaction = "";
+            string markerColor = "White";
 
             try
             {
                 string programName = instructionSet[0];
                 try { ISspecifiedExecInterval = Int32.Parse(instructionSet[1]); } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
                 try { faction = Int32.Parse(instructionSet[2]);}catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
-
+                //try { markerColor = instructionSet[3]; } catch (FormatException) { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
                 //Configure memory abstracts
                 string[] thisProgramMemoryStrings = new string[0] { };
                 bool[] thisProgramMemoryBools = new bool[0] { };
@@ -64,28 +67,39 @@ namespace PEWCore.Modules
                 timeUntilLastExecution = thisProgramMemoryInts[0];
                 currentSafezoneradius = thisProgramMemoryInts[1];
 
+                //MyAPIGateway.Utilities.ShowMessage("DBG", "Entry");
+
                 VRage.ModAPI.IMyEntity parent = entity.GetTopMostParent(); //Topmost parent of logical core is the grid on which it is installed.
+
+                //MyAPIGateway.Utilities.ShowMessage("DBG", "Proper");
+
                 switch (faction)
                 {
                     case 1:
                         if ((PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction1Tag != "xxxxx") && (PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction1Tag != ""))
                         {
                             safeZoneFaction = PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction1Tag;
-                        } else { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(ISspecifiedExecInterval, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                        } else {
+                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCoreModule_SSZ] System failure. PEWCore_Faction1Tag is not configured.", VRageMath.Color.White);
+                            return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
                     break;
                     case 2:
                         if ((PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction2Tag != "xxxxx") && (PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction2Tag != ""))
                         {
                             safeZoneFaction = PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction2Tag;
                         }
-                        else { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(ISspecifiedExecInterval, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                        else {
+                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCoreModule_SSZ] System failure. PEWCore_Faction2Tag is not configured.", VRageMath.Color.White);
+                            return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
                     break;
                     case 3:
                         if ((PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction3Tag != "xxxxx") && (PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction3Tag != ""))
                         {
                             safeZoneFaction = PEWCoreMain.ConfigData.PEWGeneralConfig.PEWCore_Faction3Tag;
                         }
-                        else { return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(ISspecifiedExecInterval, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
+                        else {
+                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("[PEWCoreModule_SSZ] System failure. PEWCore_Faction3Tag is not configured.", VRageMath.Color.White);
+                            return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory)); }
                     break;
                 }
 
@@ -133,9 +147,9 @@ namespace PEWCore.Modules
                             {
                                 if (Faction != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId))
                                 {
-                                    foundPlayer.Kill();
+                                    Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("Player " + foundPlayer.DisplayName + " tried to enter " + safeZoneFaction + "'s soft safezone and was killed by the guardians.", VRageMath.Color.Red);
+                                    //foundPlayer.Kill();
                                 }
-                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("Player " + foundPlayer.DisplayName + " tried to enter " + safeZoneFaction  + "'s soft safezone and was killed by the guardians.", VRageMath.Color.Red);
                             }
                         }
                     }
@@ -163,7 +177,14 @@ namespace PEWCore.Modules
                                         var factionTag = block.GetOwnerFactionTag();
                                         if (factionTag != null)
                                         {
-                                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + "tried to send a remote control block into " + safeZoneFaction + "'s soft safezone. The block was destroyed by the guardians.", VRageMath.Color.White);
+                                            if (factionTag != "")
+                                            {
+                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + "tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                            }
+                                            else
+                                            {
+                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A factionless player tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                            }
                                         }
                                         block.Delete();
                                     }
@@ -173,7 +194,7 @@ namespace PEWCore.Modules
                     }
                 }
 
-                List<MyTuple<string, int, IMyGps>> systemGPSTable = PEWCoreMain.PEWNetworkGPSManagerHandle.GPSManagerSystemGPSTable();
+                List<MyTuple<string, int, IMyGps>> systemGPSTable = PEWCoreMain.PEWNetworkGPSManager.GPSManagerSystemGPSTable();
                 bool HVTinSafezone = false;
                 for (int z = 0; z < systemGPSTable.Count; z++)
                 {
@@ -207,11 +228,12 @@ namespace PEWCore.Modules
                 }
 
 
-                IMyGps temp = MyAPIGateway.Session.GPS.Create("Soft SafeZone [" + safeZoneFaction + "][" + currentSafezoneradius.ToString() + "]","This is the soft safezone for " + safeZoneFaction + ".",position,true);
-                PEWCoreMain.PEWNetworkGPSManagerHandle.GPSManagerAddOrUpdateSystemGPS(safeZoneFaction + "_SSZ", temp);
-
+                IMyGps temp = MyAPIGateway.Session.GPS.Create("System_Soft_SafeZone [" + safeZoneFaction + "][" + currentSafezoneradius.ToString() + "]","This is the soft safezone for " + safeZoneFaction + ".",position,true);
+                PEWCoreMain.PEWNetworkGPSManager.GPSManagerCleanSystemGPSByRegex("System_Soft_SafeZone", safeZoneFaction);
+                PEWCoreMain.PEWNetworkGPSManager.GPSManagerAddOrUpdateSystemGPS(safeZoneFaction + "_SSZ", temp);
                 timeUntilLastExecution = timeUntilLastExecution + ISspecifiedExecInterval;
                 thisProgramMemoryInts[0] = timeUntilLastExecution;
+
                 thisProgramMemoryInts[1] = currentSafezoneradius;
 
                 PEWCoreNonVolatileMemory.SetMemorySegment(thisLogicalCore.Name, nonVolatileMemory.NonVolatileMemoryNonShared, thisProgramMemoryStrings, thisProgramMemoryBools, thisProgramMemoryInts);
