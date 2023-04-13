@@ -21,7 +21,7 @@ namespace PEWCore
     public class PEWGeneralConfig
     {
         [ProtoMember(1)]
-        public string PEWCore_Faction1Tag = "xxxxx"; //Tag of faction 1
+        public string PEWCore_Faction1Tag = "PPG"; //Tag of faction 1
         [ProtoMember(2)]
         public string PEWCore_Faction2Tag = "xxxxx"; //Tag of faction 2
         [ProtoMember(3)]
@@ -44,11 +44,13 @@ namespace PEWCore
     public class PEWHVTConfig
     {
         [ProtoMember(1)]
-        public int PEWHVT_CheckInterval = 3600; // How often to check world for HVT grids. (seconds)
+        public int PEWHVT_CheckInterval = 10; // How often to check world for HVT grids. (seconds)
         [ProtoMember(2)]
         public int PEWHVT_HVTThreshold = 7500; //Standard threshold for a grid/grid-group to be flagged as an HVT. (Block count)
         [ProtoMember(3)]
         public int PEWHVT_HVTThresholdE52 = 11000; //Threshold for a grid/grid-group employed the E52 Special Weapon to be flagged as an HVT. (Block count)
+        [ProtoMember(4)]
+        public int PEWHVT_HVTClusterRadius = 500;
     }
 
     [ProtoContract(UseProtoMembersOnly = true)]
