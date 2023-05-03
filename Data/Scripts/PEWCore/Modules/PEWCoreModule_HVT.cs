@@ -65,10 +65,9 @@ namespace PEWCore.Modules
                 {
                     timeUntilLastExecution = 0;
                     Vector3D position = parent.GetPosition();
-                    BoundingSphereD sphere = new BoundingSphereD(position, 150000f);
+                    BoundingSphereD sphere = new BoundingSphereD(position, PEWCoreMain.ConfigData.PEWHVTConfig.PEWHVT_HVTScanRadius);
                     List<VRage.ModAPI.IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
                     List<VRageMath.Vector3D> HVT_coordinates = new List<VRageMath.Vector3D>();
-                    List<VRageMath.Vector3D> HVTentitiesPOS = new List<VRageMath.Vector3D>();
                     bool HVTViolation = false;
                     //MyAPIGateway.Utilities.ShowMessage("DBG entities count", entities.Count.ToString());
 
@@ -118,8 +117,6 @@ namespace PEWCore.Modules
 
                                 if ((grid.BlocksCount > PEWCoreMain.ConfigData.PEWHVTConfig.PEWHVT_HVTThreshold) || (gridGroupTotalBlocks > PEWCoreMain.ConfigData.PEWHVTConfig.PEWHVT_HVTThreshold))
                                 {
-                                    HVTentitiesPOS.Add(grid.Physics.Center);
-                                    HVTViolation = true;
 
                                     foreach (Vector3D temp in HVT_coordinates)
                                     {
@@ -132,9 +129,12 @@ namespace PEWCore.Modules
                                     {
                                         bool gridBigOwnerSuccess = false;
                                         try 
-                                        { 
-                                            MyAPIGateway.Utilities.ShowMessage("DBGlongid", grid.BigOwners[0].ToString());
-                                            gridBigOwnerSuccess = true;
+                                        {
+                                            IMyFaction temp = MyAPIGateway.Session.Factions.TryGetPlayerFaction(grid.BigOwners[0]);
+                                            if (temp.Tag != "ADM")
+                                            {
+                                                gridBigOwnerSuccess = true;
+                                            }
                                         } catch (Exception e) 
                                         { 
                                         }
@@ -145,8 +145,9 @@ namespace PEWCore.Modules
                                             string gridBigOwnerFactionTag = gridBigOwnerFaction.Tag;
                                             //try { IMyFaction playerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(grid.BigOwners[0]); playerFactionTag = playerFaction.Tag; } catch (Exception e) { MyAPIGateway.Utilities.ShowMessage("DBG", "Can't get HVT bigowner faction1"); }
                                             //MyAPIGateway.Utilities.ShowMessage("DBG", playerFaction.Tag);
-                                            if (gridBigOwnerFactionTag != "SPRT")
+                                            if ((gridBigOwnerFactionTag != "SPRT") && (gridBigOwnerFactionTag != "SPID"))
                                             {
+                                                HVTViolation = true;
                                                 if (gridBigOwnerFactionTag != "")
                                                 {
                                                     IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target [" + gridBigOwnerFactionTag + "]", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", grid.Physics.Center, true);
