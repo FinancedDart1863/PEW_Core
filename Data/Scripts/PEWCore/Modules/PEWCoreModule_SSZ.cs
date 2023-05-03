@@ -138,7 +138,7 @@ namespace PEWCore.Modules
                                 {
                                     if (connectedPlayers[x].PromoteLevel == MyPromoteLevel.Admin || connectedPlayers[x].PromoteLevel == MyPromoteLevel.Owner)
                                     {
-                                        //playerIsAdmin = true;
+                                        playerIsAdmin = true;
                                     }
                                 }
                             }
@@ -148,7 +148,7 @@ namespace PEWCore.Modules
                                 if (Faction != MyAPIGateway.Session.Factions.TryGetPlayerFaction(foundPlayer.ControllerInfo.ControllingIdentityId))
                                 {
                                     Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("Player " + foundPlayer.DisplayName + " tried to enter " + safeZoneFaction + "'s soft safezone and was killed by the guardians.", VRageMath.Color.Red);
-                                    //foundPlayer.Kill();
+                                    foundPlayer.Kill();
                                 }
                             }
                         }
