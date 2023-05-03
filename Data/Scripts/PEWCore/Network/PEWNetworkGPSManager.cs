@@ -135,7 +135,6 @@ namespace PEWCore.Network
                     if (Regex.IsMatch(systemGPSTable[x].Item3.Name, regexExp1) && Regex.IsMatch(systemGPSTable[x].Item3.Name, regexExp2))
                     {
                         systemGPSTable.Remove(systemGPSTable[x]);
-                        //MyAPIGateway.Utilities.ShowMessage("DBG", "System clean HVT GPS");
                     }
                 }
             }
@@ -148,7 +147,6 @@ namespace PEWCore.Network
                         if (Regex.IsMatch(systemGPSTable[x].Item3.Name, regexExp1))
                         {
                             systemGPSTable.Remove(systemGPSTable[x]);
-                            //MyAPIGateway.Utilities.ShowMessage("DBG", "System clean HVT GPS");
                         }
                     }
                 }
