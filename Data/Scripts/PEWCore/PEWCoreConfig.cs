@@ -51,158 +51,19 @@ namespace PEWCore
         public int PEWHVT_HVTThresholdE52 = 11000; //Threshold for a grid/grid-group employed the E52 Special Weapon to be flagged as an HVT. (Block count)
         [ProtoMember(4)]
         public int PEWHVT_HVTClusterRadius = 500;
+        [ProtoMember(5)]
+        public double PEWHVT_HVTScanRadius = 150000f;
     }
 
     [ProtoContract(UseProtoMembersOnly = true)]
     public class PEWKOTHConfig
     {
-        //King of the hill default settings
         [ProtoMember(1)]
-        public bool PEWKOTH_Hill1Enable = true; //Do we enable hill 1?
+        public PEWKOTHInstanceConfig Hill1Config = new PEWKOTHInstanceConfig();
         [ProtoMember(2)]
-        public string PEWKOTH_Hill1Name = "Hill 1"; //What do we call hill 1?
+        public PEWKOTHInstanceConfig Hill2Config = new PEWKOTHInstanceConfig();
         [ProtoMember(3)]
-        public bool PEWKOTH_Hill1AlwaysOn = false; //Is hill 1 always active if its enabled?
-        [ProtoMember(4)]
-        public int PEWKOTH_Hill1TurnOnTime = 19; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
-        [ProtoMember(5)]
-        public int PEWKOTH_Hill1TurnOffTime = 20; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
-        [ProtoMember(6)]
-        public bool PEWKOTH_Hill1OnSunday = true; //Is hill 1 active during the time frame on this day? 
-        [ProtoMember(7)]
-        public bool PEWKOTH_Hill1OnMonday = false; //Is hill 1 active during the time frame on this day? 
-        [ProtoMember(8)]
-        public bool PEWKOTH_Hill1OnTuesday = false; //Is hill 1 active during the time frame on this day? 
-        [ProtoMember(9)]
-        public bool PEWKOTH_Hill1OnWednesday = false; //Is hill 1 active during the time frame on this day? 
-        [ProtoMember(10)]
-        public bool PEWKOTH_Hill1OnThursday = false; //Is hill 1 active during the time frame on this day? 
-        [ProtoMember(11)]
-        public bool PEWKOTH_Hill1OnFriday = false; //Is hill 1 active during the time frame on this day? 
-        [ProtoMember(12)]
-        public bool PEWKOTH_Hill1OnSaturday = true; //Is hill 1 active during the time frame on this day? 
-        [ProtoMember(13)]
-        public string PEWKOTH_Hill1Faction1ContainerName = "xxxxx"; //Name of the cargo container for faction 1 at hill 1 in which to deposit reward items
-        [ProtoMember(14)]
-        public string PEWKOTH_Hill1Faction2ContainerName = "xxxxx"; //Name of the cargo container for faction 2 at hill 1 in which to deposit reward items
-        [ProtoMember(15)]
-        public string PEWKOTH_Hill1Faction3ContainerName = "xxxxx"; //Name of the cargo container for faction 3 at hill 1 in which to deposit reward items
-        [ProtoMember(16)]
-        public string PEWKOTH_Hill1AwardItem1Name = "xxxxx"; //Classname of the first type of item to be dispensed as an award at hill 1. Leave blank for to disable this reward slot
-        [ProtoMember(17)]
-        public int PEWKOTH_Hill1AwardItem1Interval = 300; //Delay in seconds between dispensing of this award item 1 into the controlling factions container
-        [ProtoMember(18)]
-        public int PEWKOTH_Hill1AwardItem1Amount = 1; //Amount of award item 1 to be dispensed into the controlling factions container at each interval
-        [ProtoMember(19)]
-        public string PEWKOTH_Hill1AwardItem2Name = "xxxxx"; //Classname of the second type of item to be dispensed as an award at hill 1. Leave blank for to disable this reward slot
-        [ProtoMember(20)]
-        public int PEWKOTH_Hill1AwardItem2Interval = 300; //Delay in seconds between dispensing of this award item 2 into the controlling factions container
-        [ProtoMember(21)]
-        public int PEWKOTH_Hill1AwardItem2Amount = 1; //Amount of award item 2 to be dispensed into the controlling factions container at each interval
-        [ProtoMember(22)]
-        public string PEWKOTH_Hill1AwardItem3Name = "xxxxx"; //Classname of the third type of item to be dispensed as an award at hill 1. Leave blank for to disable this reward slot
-        [ProtoMember(23)]
-        public int PEWKOTH_Hill1AwardItem3Interval = 300; //Delay in seconds between dispensing of this award item 3 into the controlling factions container
-        [ProtoMember(24)]
-        public int PEWKOTH_Hill1AwardItem3Amount = 1; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
-
-        [ProtoMember(25)]
-        public bool PEWKOTH_Hill2Enable = true; //Do we enable hill 2?
-        [ProtoMember(26)]
-        public string PEWKOTH_Hill2Name = "Hill 2"; //What do we call hill 2?
-        [ProtoMember(27)]
-        public bool PEWKOTH_Hill2AlwaysOn = false; //Is hill 2 always active if its enabled?
-        [ProtoMember(28)]
-        public int PEWKOTH_Hill2TurnOnTime = 19; //If PEWKOTH_Hill2AlwaysOn is false and PEWKOTH_Hill2Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
-        [ProtoMember(29)]
-        public int PEWKOTH_Hill2TurnOffTime = 20; //If PEWKOTH_Hill2AlwaysOn is false and PEWKOTH_Hill2Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
-        [ProtoMember(30)]
-        public bool PEWKOTH_Hill2OnSunday = true; //Is hill 2 active during the time frame on this day? 
-        [ProtoMember(31)]
-        public bool PEWKOTH_Hill2OnMonday = false; //Is hill 2 active during the time frame on this day? 
-        [ProtoMember(32)]
-        public bool PEWKOTH_Hill2OnTuesday = false; //Is hill 2 active during the time frame on this day? 
-        [ProtoMember(33)]
-        public bool PEWKOTH_Hill2OnWednesday = false; //Is hill 2 active during the time frame on this day? 
-        [ProtoMember(34)]
-        public bool PEWKOTH_Hill2OnThursday = false; //Is hill 2 active during the time frame on this day? 
-        [ProtoMember(35)]
-        public bool PEWKOTH_Hill2OnFriday = false; //Is hill 2 active during the time frame on this day? 
-        [ProtoMember(36)]
-        public bool PEWKOTH_Hill2OnSaturday = true; //Is hill 2 active during the time frame on this day? 
-        [ProtoMember(37)]
-        public string PEWKOTH_Hill2Faction1ContainerName = "xxxxx"; //Name of the cargo container for faction 1 at hill 2 in which to deposit reward items
-        [ProtoMember(38)]
-        public string PEWKOTH_Hill2Faction2ContainerName = "xxxxx"; //Name of the cargo container for faction 2 at hill 2 in which to deposit reward items
-        [ProtoMember(39)]
-        public string PEWKOTH_Hill2Faction3ContainerName = "xxxxx"; //Name of the cargo container for faction 3 at hill 2 in which to deposit reward items
-        [ProtoMember(40)]
-        public string PEWKOTH_Hill2AwardItem1Name = "xxxxx"; //Classname of the first type of item to be dispensed as an award at hill 2. Leave blank for to disable this reward slot
-        [ProtoMember(41)]
-        public int PEWKOTH_Hill2AwardItem1Interval = 300; //Delay in seconds between dispensing of this award item 1 into the controlling factions container
-        [ProtoMember(42)]
-        public int PEWKOTH_Hill2AwardItem1Amount = 1; //Amount of award item 1 to be dispensed into the controlling factions container at each interval
-        [ProtoMember(43)]
-        public string PEWKOTH_Hill2AwardItem2Name = "xxxxx"; //Classname of the second type of item to be dispensed as an award at hill 2. Leave blank for to disable this reward slot
-        [ProtoMember(44)]
-        public int PEWKOTH_Hill2AwardItem2Interval = 300; //Delay in seconds between dispensing of this award item 2 into the controlling factions container
-        [ProtoMember(45)]
-        public int PEWKOTH_Hill2AwardItem2Amount = 1; //Amount of award item 2 to be dispensed into the controlling factions container at each interval
-        [ProtoMember(46)]
-        public string PEWKOTH_Hill2AwardItem3Name = "xxxxx"; //Classname of the third type of item to be dispensed as an award at hill 2. Leave blank for to disable this reward slot
-        [ProtoMember(47)]
-        public int PEWKOTH_Hill2AwardItem3Interval = 300; //Delay in seconds between dispensing of this award item 3 into the controlling factions container
-        [ProtoMember(48)]
-        public int PEWKOTH_Hill2AwardItem3Amount = 1; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
-
-        [ProtoMember(49)]
-        public bool PEWKOTH_Hill3Enable = true; //Do we enable hill 3?
-        [ProtoMember(50)]
-        public string PEWKOTH_Hill3Name = "Hill 3"; //What do we call hill 3?
-        [ProtoMember(51)]
-        public bool PEWKOTH_Hill3AlwaysOn = false; //Is hill 3 always active if its enabled?
-        [ProtoMember(52)]
-        public int PEWKOTH_Hill3TurnOnTime = 19; //If PEWKOTH_Hill3AlwaysOn is false and PEWKOTH_Hill3Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
-        [ProtoMember(53)]
-        public int PEWKOTH_Hill3TurnOffTime = 20; //If PEWKOTH_Hill3AlwaysOn is false and PEWKOTH_Hill3Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
-        [ProtoMember(54)]
-        public bool PEWKOTH_Hill3OnSunday = true; //Is hill 3 active during the time frame on this day?
-        [ProtoMember(55)]
-        public bool PEWKOTH_Hill3OnMonday = false; //Is hill 3 active during the time frame on this day?
-        [ProtoMember(56)]
-        public bool PEWKOTH_Hill3OnTuesday = false; //Is hill 3 active during the time frame on this day?
-        [ProtoMember(57)]
-        public bool PEWKOTH_Hill3OnWednesday = false; //Is hill 3 active during the time frame on this day?
-        [ProtoMember(58)]
-        public bool PEWKOTH_Hill3OnThursday = false; //Is hill 3 active during the time frame on this day?
-        [ProtoMember(59)]
-        public bool PEWKOTH_Hill3OnFriday = false; //Is hill 3 active during the time frame on this day?
-        [ProtoMember(60)]
-        public bool PEWKOTH_Hill3OnSaturday = true; //Is hill 3 active during the time frame on this day?
-        [ProtoMember(61)]
-        public string PEWKOTH_Hill3Faction1ContainerName = "xxxxx"; //Name of the cargo container for faction 1 at hill 3 in which to deposit reward items
-        [ProtoMember(62)]
-        public string PEWKOTH_Hill3Faction2ContainerName = "xxxxx"; //Name of the cargo container for faction 2 at hill 3 in which to deposit reward items
-        [ProtoMember(63)]
-        public string PEWKOTH_Hill3Faction3ContainerName = "xxxxx"; //Name of the cargo container for faction 3 at hill 3 in which to deposit reward items
-        [ProtoMember(64)]
-        public string PEWKOTH_Hill3AwardItem1Name = "xxxxx"; //Classname of the first type of item to be dispensed as an award at hill 3. Leave blank for to disable this reward slot
-        [ProtoMember(65)]
-        public int PEWKOTH_Hill3AwardItem1Interval = 300; //Delay in seconds between dispensing of this award item 1 into the controlling factions container
-        [ProtoMember(66)]
-        public int PEWKOTH_Hill3AwardItem1Amount = 1; //Amount of award item 1 to be dispensed into the controlling factions container at each interval
-        [ProtoMember(67)]
-        public string PEWKOTH_Hill3AwardItem2Name = "xxxxx"; //Classname of the second type of item to be dispensed as an award at hill 3. Leave blank for to disable this reward slot
-        [ProtoMember(68)]
-        public int PEWKOTH_Hill3AwardItem2Interval = 300; //Delay in seconds between dispensing of this award item 2 into the controlling factions container
-        [ProtoMember(69)]
-        public int PEWKOTH_Hill3AwardItem2Amount = 1; //Amount of award item 2 to be dispensed into the controlling factions container at each interval
-        [ProtoMember(70)]
-        public string PEWKOTH_Hill3AwardItem3Name = "xxxxx"; //Classname of the third type of item to be dispensed as an award at hill 3. Leave blank for to disable this reward slot
-        [ProtoMember(71)]
-        public int PEWKOTH_Hill3AwardItem3Interval = 300; //Delay in seconds between dispensing of this award item 3 into the controlling factions container
-        [ProtoMember(72)]
-        public int PEWKOTH_Hill3AwardItem3Amount = 1; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
+        public PEWKOTHInstanceConfig Hill3Config = new PEWKOTHInstanceConfig();
     }
 
     [ProtoContract(UseProtoMembersOnly = true)]
@@ -220,5 +81,60 @@ namespace PEWCore
         public float PEWSSZ_ShrinkDistance = 5000f;
         [ProtoMember(6)]
         public float PEWSSZ_RegenerateDistance = 1000f;
+    }
+
+    [ProtoContract(UseProtoMembersOnly = true)]
+    public class PEWKOTHInstanceConfig
+    {
+        [ProtoMember(1)]
+        public bool PEWKOTH_HillEnable = true; //Do we enable this hill?
+        [ProtoMember(2)]
+        public string PEWKOTH_HillName = "This Hill"; //What do we call this hill?
+        [ProtoMember(3)]
+        public bool PEWKOTH_HillAlwaysOn = false; //Is this hill always active if its enabled?
+        [ProtoMember(4)]
+        public int PEWKOTH_HillTurnOnTime = 19; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn on hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        [ProtoMember(5)]
+        public int PEWKOTH_HillTurnOffTime = 20; //If PEWKOTH_Hill1AlwaysOn is false and PEWKOTH_Hill1Enable and true, then we assume the configurator would like the hill active at certain times. Specify turn off hour (0-23)(3 = 3 am UTC, 18 = 6 pm UTC, etc)
+        [ProtoMember(6)]
+        public bool PEWKOTH_HillOnSunday = true; //Is this hill active during the time frame on this day? 
+        [ProtoMember(7)]
+        public bool PEWKOTH_HillOnMonday = false; //Is this hill active during the time frame on this day? 
+        [ProtoMember(8)]
+        public bool PEWKOTH_HillOnTuesday = false; //Is this hill active during the time frame on this day? 
+        [ProtoMember(9)]
+        public bool PEWKOTH_HillOnWednesday = false; //Is this hill active during the time frame on this day? 
+        [ProtoMember(10)]
+        public bool PEWKOTH_HillOnThursday = false; //Is this hill active during the time frame on this day? 
+        [ProtoMember(11)]
+        public bool PEWKOTH_HillOnFriday = false; //Is this hill active during the time frame on this day? 
+        [ProtoMember(12)]
+        public bool PEWKOTH_HillOnSaturday = true; //Is this hill active during the time frame on this day? 
+        [ProtoMember(13)]
+        public string PEWKOTH_HillFaction1ContainerName = "xxxxx"; //Name of the cargo container for faction 1 at this hill in which to deposit reward items
+        [ProtoMember(14)]
+        public string PEWKOTH_HillFaction2ContainerName = "xxxxx"; //Name of the cargo container for faction 2 at this hill in which to deposit reward items
+        [ProtoMember(15)]
+        public string PEWKOTH_HillFaction3ContainerName = "xxxxx"; //Name of the cargo container for faction 3 at this hill in which to deposit reward items
+        [ProtoMember(16)]
+        public string PEWKOTH_HillAwardItem1Name = "xxxxx"; //Classname of the first type of item to be dispensed as an award at this hill. Leave blank for to disable this reward slot
+        [ProtoMember(17)]
+        public int PEWKOTH_HillAwardItem1Interval = 300; //Delay in seconds between dispensing of this award item 1 into the controlling factions container
+        [ProtoMember(18)]
+        public int PEWKOTH_HillAwardItem1Amount = 1; //Amount of award item 1 to be dispensed into the controlling factions container at each interval
+        [ProtoMember(19)]
+        public string PEWKOTH_HillAwardItem2Name = "xxxxx"; //Classname of the second type of item to be dispensed as an award at this hill. Leave blank for to disable this reward slot
+        [ProtoMember(20)]
+        public int PEWKOTH_HillAwardItem2Interval = 300; //Delay in seconds between dispensing of this award item 2 into the controlling factions container
+        [ProtoMember(21)]
+        public int PEWKOTH_HillAwardItem2Amount = 1; //Amount of award item 2 to be dispensed into the controlling factions container at each interval
+        [ProtoMember(22)]
+        public string PEWKOTH_HillAwardItem3Name = "xxxxx"; //Classname of the third type of item to be dispensed as an award at this hill. Leave blank for to disable this reward slot
+        [ProtoMember(23)]
+        public int PEWKOTH_HillAwardItem3Interval = 300; //Delay in seconds between dispensing of this award item 3 into the controlling factions container
+        [ProtoMember(24)]
+        public int PEWKOTH_HillAwardItem3Amount = 1; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
+        [ProtoMember(25)]
+        public double PEWKOTH_HillScanRadius = 150f; //Scan radius in meters for this hill
     }
 }
