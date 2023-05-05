@@ -23,9 +23,9 @@ namespace PEWCore
         [ProtoMember(1)]
         public string PEWCore_Faction1Tag = "PPG"; //Tag of faction 1
         [ProtoMember(2)]
-        public string PEWCore_Faction2Tag = "xxxxx"; //Tag of faction 2
+        public string PEWCore_Faction2Tag = "SHB"; //Tag of faction 2
         [ProtoMember(3)]
-        public string PEWCore_Faction3Tag = "xxxxx"; //Tag of faction 3
+        public string PEWCore_Faction3Tag = "IWD"; //Tag of faction 3
         [ProtoMember(4)]
         public bool DeveloperMode = false; //In developer mode, code execution is described in the in-game chat
         [ProtoMember(5)]
@@ -33,7 +33,7 @@ namespace PEWCore
         [ProtoMember(6)]
         public int PEWHVT_ExecutionInterval = 1; // Execution interval for module logic in seconds. Do not touch this if you don't know know what you're doing.
         [ProtoMember(7)]
-        public bool PEWKOTH_ModuleEnable = true; //Enable/disable the HVT subsystem. Do not touch this if you don't know know what you're doing. (Disabling this may cause modules with HVT subsystem dependencies to fail, such as the safezone subsystem)
+        public bool PEWKOTH_ModuleEnable = false; //Enable/disable the HVT subsystem. Do not touch this if you don't know know what you're doing. (Disabling this may cause modules with HVT subsystem dependencies to fail, such as the safezone subsystem)
         [ProtoMember(8)]
         public int PEWKOTH_ExecutionInterval = 1; // Execution interval for module logic in seconds. Do not touch this if you don't know know what you're doing.
         [ProtoMember(9)]
@@ -44,9 +44,9 @@ namespace PEWCore
     public class PEWHVTConfig
     {
         [ProtoMember(1)]
-        public int PEWHVT_CheckInterval = 10; // How often to check world for HVT grids. (seconds)
+        public int PEWHVT_CheckInterval = 1200; // How often to check world for HVT grids. (seconds)
         [ProtoMember(2)]
-        public int PEWHVT_HVTThreshold = 7500; //Standard threshold for a grid/grid-group to be flagged as an HVT. (Block count)
+        public int PEWHVT_HVTThreshold = 8500; //Standard threshold for a grid/grid-group to be flagged as an HVT. (Block count)
         [ProtoMember(3)]
         public int PEWHVT_HVTThresholdE52 = 11000; //Threshold for a grid/grid-group employed the E52 Special Weapon to be flagged as an HVT. (Block count)
         [ProtoMember(4)]
@@ -70,7 +70,7 @@ namespace PEWCore
     public class PEWSSZConfig
     {
         [ProtoMember(1)]
-        public float PEWSSZ_Radius = 30f; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
+        public float PEWSSZ_Radius = 35000f; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
         [ProtoMember(2)]
         public bool PEWSSZ_AllowEnemyCharacters = false; //Amount of award item 3 to be dispensed into the controlling factions container at each interval
         [ProtoMember(3)]
