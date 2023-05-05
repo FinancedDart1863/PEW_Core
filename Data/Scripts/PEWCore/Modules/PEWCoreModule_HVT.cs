@@ -26,6 +26,7 @@ using VRage.Game.ModAPI;
 using System.Text.RegularExpressions;
 using VRage.Scripting;
 using VRage.Game.VisualScripting;
+using System.Linq.Expressions;
 
 namespace PEWCore.Modules
 {
@@ -69,7 +70,6 @@ namespace PEWCore.Modules
                     List<VRage.ModAPI.IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
                     List<VRageMath.Vector3D> HVT_coordinates = new List<VRageMath.Vector3D>();
                     bool HVTViolation = false;
-                    //MyAPIGateway.Utilities.ShowMessage("DBG entities count", entities.Count.ToString());
 
                     PEWCoreMain.PEWNetworkGPSManager.GPSManagerCleanHVTSystemGPS();
 
@@ -117,10 +117,9 @@ namespace PEWCore.Modules
 
                                 if ((grid.BlocksCount > PEWCoreMain.ConfigData.PEWHVTConfig.PEWHVT_HVTThreshold) || (gridGroupTotalBlocks > PEWCoreMain.ConfigData.PEWHVTConfig.PEWHVT_HVTThreshold))
                                 {
-
                                     foreach (Vector3D temp in HVT_coordinates)
                                     {
-                                        if (Vector3D.Distance(temp, grid.Physics.Center) < (double)PEWCoreMain.ConfigData.PEWHVTConfig.PEWHVT_HVTClusterRadius)
+                                        if (Vector3D.Distance(temp, foundEntity.GetPosition()) < (double)PEWCoreMain.ConfigData.PEWHVTConfig.PEWHVT_HVTClusterRadius)
                                         {
                                             adjacentHVTPresent = true;
                                         }
@@ -130,33 +129,32 @@ namespace PEWCore.Modules
                                         bool gridBigOwnerSuccess = false;
                                         try 
                                         {
-                                            IMyFaction temp = MyAPIGateway.Session.Factions.TryGetPlayerFaction(grid.BigOwners[0]);
-                                            if (temp.Tag != "ADM")
-                                            {
-                                                gridBigOwnerSuccess = true;
-                                            }
+                                            long BigOwnerID = grid.BigOwners[0];
+                                            gridBigOwnerSuccess = true;
                                         } catch (Exception e) 
-                                        { 
+                                        {
                                         }
 
                                         if (gridBigOwnerSuccess)
                                         {
-                                            IMyFaction gridBigOwnerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(grid.BigOwners[0]);
-                                            string gridBigOwnerFactionTag = gridBigOwnerFaction.Tag;
-                                            //try { IMyFaction playerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(grid.BigOwners[0]); playerFactionTag = playerFaction.Tag; } catch (Exception e) { MyAPIGateway.Utilities.ShowMessage("DBG", "Can't get HVT bigowner faction1"); }
-                                            //MyAPIGateway.Utilities.ShowMessage("DBG", playerFaction.Tag);
+                                            string gridBigOwnerFactionTag = "";
+                                            try
+                                            {
+                                                IMyFaction gridBigOwnerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(grid.BigOwners[0]);
+                                                gridBigOwnerFactionTag = gridBigOwnerFaction.Tag;
+                                            } catch (Exception e) { }
                                             if ((gridBigOwnerFactionTag != "SPRT") && (gridBigOwnerFactionTag != "SPID"))
                                             {
                                                 HVTViolation = true;
                                                 if (gridBigOwnerFactionTag != "")
                                                 {
-                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target [" + gridBigOwnerFactionTag + "]", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", grid.Physics.Center, true);
+                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target [" + gridBigOwnerFactionTag + "]", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", foundEntity.GetPosition(), true);
                                                     temp.GPSColor = VRageMath.Color.DarkRed;
                                                     PEWCoreMain.PEWNetworkGPSManager.GPSManagerAddSystemGPS("HVT_High Value Target", temp);
                                                 }
-                                                else
+                                                if (gridBigOwnerFactionTag == "")
                                                 {
-                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", grid.Physics.Center, true);
+                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", foundEntity.GetPosition(), true);
                                                     temp.GPSColor = VRageMath.Color.DarkRed;
                                                     PEWCoreMain.PEWNetworkGPSManager.GPSManagerAddSystemGPS("HVT_High Value Target", temp);
                                                 }
@@ -177,7 +175,7 @@ namespace PEWCore.Modules
                     }
 
                 }
-                timeUntilLastExecution++;
+                timeUntilLastExecution = timeUntilLastExecution + ISspecifiedExecInterval;
                 thisProgramMemoryInts[0] = timeUntilLastExecution;
 
                 PEWCoreNonVolatileMemory.SetMemorySegment(thisLogicalCore.Name, nonVolatileMemory.NonVolatileMemoryNonShared, thisProgramMemoryStrings, thisProgramMemoryBools, thisProgramMemoryInts);
