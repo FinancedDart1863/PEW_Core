@@ -32,13 +32,15 @@ namespace PEWCore
                 case "GeneralFactionAssigner":
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | GeneralFactionAssigner]", "GeneralFactionAssigner");
                     return PEWCoreProgram_GeneralFactionAssigner.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
-                case "PEWCoreKOTH":
+                //case "PEWCoreKOTH":
                     //MyAPIGateway.Utilities.ShowMessage("[PEWCoreExecutableLibrary | PEWCoreKOTHExecute]", "PEWCoreKOTH");
-                    return PEWCoreModule_KOTH.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
+                    //return PEWCoreModule_KOTH.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
                 case "PEWCoreSSZ":
                     return PEWCoreModule_SSZ.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
                 case "PEWCoreHVT":
                     return PEWCoreModule_HVT.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
+                //case "PEWCoreKOTH":
+                    //return PEWCoreModule_KOTH.execute(entity, instructionSet, volatileMemory, nonVolatileMemory);
                 default:
                     return new MyTuple<int, MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>>(0, new MyTuple<PEWCoreVolatileMemory, PEWCoreNonVolatileMemory>(volatileMemory, nonVolatileMemory));
             }
