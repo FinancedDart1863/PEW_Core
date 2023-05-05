@@ -159,10 +159,12 @@ namespace PEWCore.Modules
                         if (!PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_AllowEnemyRemoteControlBlocks)
                         {
                             MyCubeGrid grid = (MyCubeGrid)foundEntity;
+                            IMyCubeGrid igrid = (IMyCubeGrid)foundEntity;
                             bool hostileGrid = false;
-                            for (int i = 0; i < grid.BigOwners.Count; i++)
+
+                            for (int i = 0; i < igrid.BigOwners.Count; i++)
                             {
-                                if (MyAPIGateway.Session.Factions.TryGetPlayerFaction(grid.BigOwners[i]) != Faction)
+                                if (MyAPIGateway.Session.Factions.TryGetPlayerFaction(igrid.BigOwners[i]) != Faction)
                                 {
                                     hostileGrid = true;
                                 }
@@ -175,18 +177,27 @@ namespace PEWCore.Modules
                                     if (remoteControl != null)
                                     {
                                         var factionTag = block.GetOwnerFactionTag();
-                                        if (factionTag != null)
+                                        if (block.GetType() == typeof(MyRemoteControl))
                                         {
-                                            if (factionTag != "")
+                                            if (remoteControl.IsFunctional)
                                             {
-                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + "tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
-                                            }
-                                            else
-                                            {
-                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A factionless player tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("DBGd", VRageMath.Color.White);
+                                                var iblock = block as IMyCubeBlock;
+                                                ((IMySlimBlock)iblock.SlimBlock).DecreaseMountLevel(999999f, null);
+                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("DBG3", VRageMath.Color.White);
+                                                if (factionTag != null)
+                                                {
+                                                    if (factionTag != "")
+                                                    {
+                                                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + "tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                                    }
+                                                    else
+                                                    {
+                                                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A factionless player tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                                    }
+                                                }
                                             }
                                         }
-                                        block.Delete();
                                     }
                                 }
                             }
