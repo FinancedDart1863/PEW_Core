@@ -124,6 +124,9 @@ Place a logical core. Place three logical zones and name them to something you c
 Add the following instruction set to the logical core, replacing bracketed prompts with your references and the   
 appropriate information. Make sure to end each line with a * symbol!
 
+Player faction information is stored in the PEWCoreProgramMemory.mem file within the mod's storage folder. If a player  
+needs to have their faction changed, the server must be stopped and the mem file edited accordingly.  
+
 === Instruction Set Sample ===  
 istr0:GeneralFactionAssigner*<br />
 istr1:3*<br />
