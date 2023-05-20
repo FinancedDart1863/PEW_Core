@@ -189,7 +189,10 @@ namespace PEWCore.Modules
                                                 {
                                                     if (factionTag != "")
                                                     {
-                                                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + "tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                                        if (factionTag != safeZoneFaction)
+                                                        {
+                                                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + " tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                                        }
                                                     }
                                                     else
                                                     {
