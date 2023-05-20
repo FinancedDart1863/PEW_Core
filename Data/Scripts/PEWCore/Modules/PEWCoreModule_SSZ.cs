@@ -181,21 +181,21 @@ namespace PEWCore.Modules
                                         {
                                             if (remoteControl.IsFunctional)
                                             {
-                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("DBGd", VRageMath.Color.White);
-                                                var iblock = block as IMyCubeBlock;
-                                                ((IMySlimBlock)iblock.SlimBlock).DecreaseMountLevel(999999f, null);
-                                                Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("DBG3", VRageMath.Color.White);
                                                 if (factionTag != null)
                                                 {
                                                     if (factionTag != "")
                                                     {
                                                         if (factionTag != safeZoneFaction)
                                                         {
+                                                            var iblock = block as IMyCubeBlock;
+                                                            ((IMySlimBlock)iblock.SlimBlock).DecreaseMountLevel(999999f, null);
                                                             Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + " tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
                                                         }
                                                     }
                                                     else
                                                     {
+                                                        var iblock = block as IMyCubeBlock;
+                                                        ((IMySlimBlock)iblock.SlimBlock).DecreaseMountLevel(999999f, null);
                                                         Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A factionless player tried to send one or more remote control block(s) into " + safeZoneFaction + "'s soft safezone. Any remote control blocks were destroyed by the guardians.", VRageMath.Color.White);
                                                     }
                                                 }
