@@ -148,13 +148,13 @@ namespace PEWCore.Modules
                                                 HVTViolation = true;
                                                 if (gridBigOwnerFactionTag != "")
                                                 {
-                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target [" + gridBigOwnerFactionTag + "]", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", foundEntity.GetPosition(), true);
+                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target [" + gridBigOwnerFactionTag + "]", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", foundEntity.GetPosition(), false);
                                                     temp.GPSColor = VRageMath.Color.DarkRed;
                                                     PEWCoreMain.PEWNetworkGPSManager.GPSManagerAddSystemGPS("HVT_High Value Target", temp);
                                                 }
                                                 if (gridBigOwnerFactionTag == "")
                                                 {
-                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", foundEntity.GetPosition(), true);
+                                                    IMyGps temp = MyAPIGateway.Session.GPS.Create("HVT_High Value Target", "A grid or grid-group above the threshold has been detected at these coordinates! Go attack it!", foundEntity.GetPosition(), false);
                                                     temp.GPSColor = VRageMath.Color.DarkRed;
                                                     PEWCoreMain.PEWNetworkGPSManager.GPSManagerAddSystemGPS("HVT_High Value Target", temp);
                                                 }
