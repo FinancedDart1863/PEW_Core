@@ -239,6 +239,7 @@ namespace PEWCore.Modules
 
                 List<MyTuple<string, int, IMyGps>> systemGPSTable = PEWCoreMain.PEWNetworkGPSManager.GPSManagerSystemGPSTable();
                 bool HVTinSafezone = false;
+                bool SSZshrunk = false;
 
 
                 if (timeUntilLastExecution >= PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_HVTActionInterval)
@@ -252,10 +253,14 @@ namespace PEWCore.Modules
                             {
                                 if (Vector3D.Distance(systemGPSTable[z].Item3.Coords, position) < (double)currentSafezoneradius)
                                 {
-                                    HVTinSafezone = true;
-                                    currentSafezoneradius = currentSafezoneradius - (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_ShrinkDistance);
-                                    if (currentSafezoneradius < 0) { currentSafezoneradius = 0; }
-                                    Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored(safeZoneFaction + " has an HVT inside their soft safezone! " + safeZoneFaction + "'s soft safezone effective range has been reduced to " + currentSafezoneradius.ToString() + " meters.", VRageMath.Color.White);
+                                    if (!SSZshrunk)
+                                    {
+                                        SSZshrunk = true;
+                                        HVTinSafezone = true;
+                                        currentSafezoneradius = currentSafezoneradius - (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_ShrinkDistance);
+                                        if (currentSafezoneradius < 0) { currentSafezoneradius = 0; }
+                                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored(safeZoneFaction + " has an HVT inside their soft safezone! " + safeZoneFaction + "'s soft safezone effective range has been reduced to " + currentSafezoneradius.ToString() + " meters.", VRageMath.Color.White);
+                                    }
                                 }
                             }
                         }
