@@ -174,6 +174,7 @@ namespace PEWCore.Modules
                                 foreach (MyCubeBlock block in grid.GetFatBlocks())
                                 {
                                     var remoteControl = block as IMyRemoteControl;
+                                    var cockpit = block as IMyCockpit;
                                     if (remoteControl != null)
                                     {
                                         var factionTag = block.GetOwnerFactionTag();
@@ -202,6 +203,34 @@ namespace PEWCore.Modules
                                             }
                                         }
                                     }
+                                    if (cockpit != null)
+                                    {
+                                        var factionTag = block.GetOwnerFactionTag();
+                                        if (block.GetType() == typeof(MyCockpit))
+                                        {
+                                            if (cockpit.IsFunctional)
+                                            {
+                                                if (factionTag != null)
+                                                {
+                                                    if (factionTag != "")
+                                                    {
+                                                        if (factionTag != safeZoneFaction)
+                                                        {
+                                                            var iblock = block as IMyCockpit;
+                                                            ((IMySlimBlock)iblock.SlimBlock).DecreaseMountLevel(999999f, null);
+                                                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A player on " + factionTag + " tried to send one or more cockpit(s) into " + safeZoneFaction + "'s soft safezone. Any cockpit blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        var iblock = block as IMyCockpit;
+                                                        ((IMySlimBlock)iblock.SlimBlock).DecreaseMountLevel(999999f, null);
+                                                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored("A factionless player tried to send one or more cockpit(s) into " + safeZoneFaction + "'s soft safezone. Any cockpit blocks were destroyed by the guardians.", VRageMath.Color.White);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -210,34 +239,36 @@ namespace PEWCore.Modules
 
                 List<MyTuple<string, int, IMyGps>> systemGPSTable = PEWCoreMain.PEWNetworkGPSManager.GPSManagerSystemGPSTable();
                 bool HVTinSafezone = false;
-                for (int z = 0; z < systemGPSTable.Count; z++)
+
+
+                if (timeUntilLastExecution >= PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_HVTActionInterval)
                 {
-                    if (Regex.IsMatch(systemGPSTable[z].Item3.Name, "HVT_"))
+                    timeUntilLastExecution = 0;
+                    for (int z = 0; z < systemGPSTable.Count; z++)
                     {
-                        if (Regex.IsMatch(systemGPSTable[z].Item3.Name, safeZoneFaction))
+                        if (Regex.IsMatch(systemGPSTable[z].Item3.Name, "HVT_"))
                         {
-                            HVTinSafezone = true;
-                            if (timeUntilLastExecution >= PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_HVTActionInterval)
+                            if (Regex.IsMatch(systemGPSTable[z].Item3.Name, safeZoneFaction))
                             {
                                 if (Vector3D.Distance(systemGPSTable[z].Item3.Coords, position) < (double)currentSafezoneradius)
                                 {
+                                    HVTinSafezone = true;
                                     currentSafezoneradius = currentSafezoneradius - (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_ShrinkDistance);
                                     if (currentSafezoneradius < 0) { currentSafezoneradius = 0; }
                                     Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored(safeZoneFaction + " has an HVT inside their soft safezone! " + safeZoneFaction + "'s soft safezone effective range has been reduced to " + currentSafezoneradius.ToString() + " meters.", VRageMath.Color.White);
                                 }
-                                timeUntilLastExecution = 0;
                             }
                         }
                     }
-                }
 
-                if (!HVTinSafezone)
-                {
-                    if (currentSafezoneradius < (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_Radius))
+                    if (!HVTinSafezone)
                     {
-                        currentSafezoneradius = currentSafezoneradius + (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_RegenerateDistance);
-                        if (currentSafezoneradius > (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_Radius)) { currentSafezoneradius = (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_Radius); }
-                        Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored(safeZoneFaction + "'s soft safezone effective range has regenerated to " + currentSafezoneradius.ToString() + " meters.", VRageMath.Color.White);
+                        if (currentSafezoneradius < (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_Radius))
+                        {
+                            currentSafezoneradius = currentSafezoneradius + (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_RegenerateDistance);
+                            if (currentSafezoneradius > (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_Radius)) { currentSafezoneradius = (int)Math.Round(PEWCoreMain.ConfigData.PEWSSZConfig.PEWSSZ_Radius); }
+                            Sandbox.Game.MyVisualScriptLogicProvider.SendChatMessageColored(safeZoneFaction + "'s soft safezone effective range has regenerated to " + currentSafezoneradius.ToString() + " meters.", VRageMath.Color.White);
+                        }
                     }
                 }
 
